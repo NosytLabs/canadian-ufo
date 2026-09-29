@@ -19,7 +19,7 @@ activity — "unidentified" is the finding, not a conclusion.
 | `site/vendor/leaflet/` | Vendored Leaflet 1.9.4 (BSD-2), so the map works without a CDN. |
 | `03-declassified/` | The 29-volume Canada FOIA series (8,759 pages) and the 2010–2019 CIRVIS compilation. ~1 GB, not in git. |
 | `02-official-open-data/` | The Sky Canada Project report (OCSA, June 2025). Not in git; fetched from science.gc.ca. |
-| `data/` | Scraped source data — the LAC UFO database index and per-department pulls. |
+| `data/` | Scraped source data, including the 1,510-description LAC index and a summary of how it was assembled. |
 | `09-scripts/` | Scrapers, data builders, the page generator, and the link checker. |
 
 ## Running it
@@ -81,9 +81,25 @@ Turner in another), and the missing MERINT incident list for Atlantic waters.
 
 - **Library and Archives Canada** — Canada's UFOs: the search for the unknown.
   ~9,500 digitized documents, four origin departments, 1947 to the early 1980s.
-  The 207 descriptions in `site/data/lac.json` are that database's own index, with
-  deep links into the live record.
   <https://www.canada.ca/en/library-archives/collection/research-help/science-technology/ufos.html>
+
+  The interface that describes this collection caps every query at 50 rows, shows
+  no total, and its `sk` parameter is not an offset: page two returns the *last*
+  fifty records and every later page repeats them. Paging a single record group
+  yields 51 records and then loops. The only way deeper is to vary the query, so
+  `09-scripts/scrape_lac_matrix.py` runs 59 of them (four record groups, eleven
+  provinces, all forty-four province-by-group pairings) and unions the result:
+  **1,510 distinct descriptions**, of which 1,357 carry a document date and 1,311
+  name a location. `09-scripts/lac_titles.py` recovers a description for all
+  1,510. These land in `data/lac_full.json` and reach the site as
+  `site/data/lac.json`.
+
+  Note LAC's province codes are its own, not the standard abbreviations:
+  Newfoundland and Labrador is `Nfld`, Prince Edward Island is `PEI`, and `NL`,
+  `PE`, the Northwest Territories and Nunavut all return nothing.
+
+  1,510 is a floor, not a total. The gap to ~9,500 is the part of the collection
+  that no combination of the interface's own query fields exposes.
 - **Canada FOIA series** — 29 volumes, 8,759 pages, released under access to
   information and mirrored here as searchable PDFs.
 - **CIRVIS Canada 2010–2019** — 169 pages of pilot and controller vital-information
@@ -98,6 +114,10 @@ Turner in another), and the missing MERINT incident list for Atlantic waters.
   2934, 2812, 1320.
 - **Map geometry** — Natural Earth admin-1, public domain, filtered to Canada and
   simplified for the web.
+- **The 2025 Canadian UFO Survey** — Ufology Research, published 9 March 2026:
+  1,052 reports, 3.42% unexplained, 16.83% explained, about 34% probable and
+  about 46% insufficient information. Figures verified against the PDF, which
+  rounds the last two.
 
 ## Machine-readable
 
