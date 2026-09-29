@@ -30,7 +30,13 @@ def w(path, obj):
 # run from ~/canadian-ufo-research). Serving site/ on its own will 404 the PDFs.
 
 # ---------------------------------------------------------------- LAC index
-lac = json.load(open(os.path.join(ROOT, "data", "lac_records.json")))
+# lac_full.json is the wide index from 09-scripts/scrape_lac_matrix.py: the union
+# of 59 distinct queries against the LAC browse interface. lac_records.json is the
+# older, single-query-per-group scrape and is only a fallback.
+_full = os.path.join(ROOT, "data", "lac_full.json")
+_lac_path = _full if os.path.exists(_full) else os.path.join(ROOT, "data", "lac_records.json")
+lac = json.load(open(_lac_path))
+print("LAC index source:", os.path.basename(_lac_path), "->", len(lac), "descriptions")
 for r in lac:
     isn = r.get("isn") or FUND.get(r["record_group"], ("", ""))[0]
     r["url"] = LAC_DETAIL.format(isn=isn, page=r["page"], rid=r["rid"])
@@ -195,9 +201,11 @@ for gi, (grp, (isn, abbr)) in enumerate(FUND.items(), start=1):
 releases = [
     {"n": "01", "title": "The federal UFO file, indexed",
          "date": "Sept. 29, 2026",
-         "blurb": "207 archival descriptions from the four federal bodies that kept Canada's UFO records - "
-                  "National Defence, Transport, the National Research Council and the RCMP - indexed and "
-                  "linked straight into Library and Archives Canada's live database."},
+         "blurb": "1,510 archival descriptions from the four federal bodies that kept Canada's UFO records - "
+                  "National Defence, Transport, the National Research Council and the RCMP - indexed and linked "
+                  "straight into Library and Archives Canada's live database. Assembled from 59 separate queries, "
+                  "because the browse interface caps each one at fifty rows and its pagination repeats the same "
+                  "final page."},
     {"n": "02", "title": "Canada FOIA release, parts 01-29",
          "date": "Sept. 29, 2026",
          "blurb": "8,759 pages of the Canadian federal UFO file, released under access-to-information and "

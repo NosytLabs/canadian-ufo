@@ -287,6 +287,10 @@ the live open-data endpoints that serve the record today.
 - Canada collected UFO reports for roughly four decades. About 9,500 digitized documents from four federal
   departments (National Defence, Transport, National Research Council, RCMP) span 1947 to the early 1980s.
   Source: https://www.canada.ca/en/library-archives/collection/research-help/science-technology/ufos.html
+- Those documents are reachable only in fragments. LAC's browse interface caps every query at fifty rows and
+  its pagination returns the same final page forever, so a single query exposes only the head and tail of its
+  result set. AURORA assembled 1,510 distinct descriptions by running 59 queries (each record group, each
+  province, and each province-by-group pairing) and taking the union.
 - Project Magnet began in 1950, when the Department of Transport let engineer Wilbert Smith research whether
   UFOs could use Earth's magnetic field for propulsion; it was terminated in 1954.
 - Project Second Storey was formed in 1952 by the Defence Research Board, chaired by NRC astronomer
@@ -302,7 +306,7 @@ the live open-data endpoints that serve the record today.
 
 - / : overview, map, release index, case grid, timeline, FAQ
 - /releases.html : 40 records in five tranches, searchable
-- /archive.html : 207 archival descriptions, searchable and sortable
+- /archive.html : 1,510 archival descriptions, searchable and sortable
 - /case.html : all case files, graded by sourcing quality
 - /map.html : eighteen case locations on an interactive Canada map
 - /media.html : verified Canadian documentary and news video
@@ -315,7 +319,7 @@ the live open-data endpoints that serve the record today.
 ## Data
 
 - /data/releases.json : 40 release records
-- /data/lac.json : 207 archival descriptions with source URLs
+- /data/lac.json : 1,510 archival descriptions with source URLs
 - /data/cases.json : 12 case files with coordinates and source links
 - /data/timeline.json, /data/media.json, /data/podcasts.json, /data/endpoints.json, /data/survey.json
 - /data/canada.json : Natural Earth province boundaries (public domain)

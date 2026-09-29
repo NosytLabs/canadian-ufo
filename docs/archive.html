@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Archival index — 207 Canadian UFO descriptions — AURORA</title>
-<meta name="description" content="Every description in Library and Archives Canada's UFO database — 207 records from the Department of National Defence, Transport, the National Research Council and the RCMP — searchable, sortable, and linked to the live archival record.">
+<title>Archival index — 1,510 Canadian UFO descriptions — AURORA</title>
+<meta name="description" content="1,510 descriptions from Library and Archives Canada's UFO database, across the Department of National Defence, Transport, the National Research Council and the RCMP, indexed from 59 separate queries. Searchable, sortable, and linked to the live archival record.">
 <link rel="canonical" href="https://nosytlabs.github.io/canadian-ufo/site/archive.html">
 <meta name="theme-color" content="#04060c">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Archival index — 207 Canadian UFO descriptions — AURORA">
+<meta property="og:title" content="Archival index — 1,510 Canadian UFO descriptions — AURORA">
 <meta property="og:description" content="The Library and Archives Canada UFO database, indexed and searchable.">
 <meta property="og:url" content="https://nosytlabs.github.io/canadian-ufo/site/archive.html">
 <link rel="stylesheet" href="assets/base.css">
@@ -17,7 +17,7 @@
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": "Archival index — 207 Canadian UFO descriptions",
+  "name": "Archival index — 1,510 Canadian UFO descriptions",
   "description": "Every indexed description in the Library and Archives Canada UFO database, with links to the live archival record.",
   "url": "https://nosytlabs.github.io/canadian-ufo/site/archive.html",
   "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/site/" }
@@ -50,13 +50,13 @@
   <section class="hero" style="padding-bottom:8px">
     <div class="hero-inner" style="grid-template-columns:1fr">
       <div>
-        <p class="kicker">Archival index · 207 descriptions · 4 record groups</p>
+        <p class="kicker">Archival index · 1,510 descriptions · 59 queries · 4 record groups</p>
         <h1 style="font-size:clamp(36px,6vw,70px)">The whole index, in one table</h1>
         <p class="hero-lede" style="max-width:76ch">
           Library and Archives Canada holds roughly 9,500 digitized documents on UFOs, accumulated between
           1947 and the early 1980s by four federal bodies: the Department of National Defence, the Department
           of Transport, the National Research Council and the RCMP. What follows is that database's own index —
-          all 207 descriptions, sortable, with a direct link into the live record for every entry.
+          1,510 descriptions, sortable, with a direct link into the live record for every entry.
         </p>
         <p class="hero-lede" style="max-width:76ch">
           This is an <em>index</em>, not the documents. Many entries carry a title and a record number and
@@ -78,29 +78,29 @@
     <div class="grid g-4">
       <article class="card reveal">
         <h3>National Defence</h3>
-        <p style="margin-top:10px">51 descriptions, filed as “Intelligence: Sighting of unknown objects”
-          and cross-referenced to microfilm reel T-3291. Fonds ISN 13019.</p>
-        <div class="chips meta"><span class="chip chip-a">51 indexed</span></div>
+        <p style="margin-top:10px">552 descriptions, the largest group, filed as “Intelligence: Sighting
+          of unknown objects” and cross-referenced to microfilm reel T-3291. Fonds ISN 13019. Almost every
+          province-by-group query lands here, which is why this group grew the most.</p>
+        <div class="chips meta"><span class="chip chip-a">552 indexed</span></div>
       </article>
       <article class="card reveal">
         <h3>Transport</h3>
-        <p style="margin-top:10px">54 descriptions, the largest single group, filed under
-          “Transportation: General: Unidentified Flying Objects”. Civil aviation and marine reporting.
-          Fonds ISN 37061.</p>
-        <div class="chips meta"><span class="chip chip-a">54 indexed</span></div>
+        <p style="margin-top:10px">52 descriptions, filed under “Transportation: General: Unidentified
+          Flying Objects”. Civil aviation and marine reporting. Fonds ISN 37061.</p>
+        <div class="chips meta"><span class="chip chip-a">52 indexed</span></div>
       </article>
       <article class="card reveal">
         <h3>National Research Council</h3>
-        <p style="margin-top:10px">51 descriptions held by the Herzberg Institute of Astrophysics as
+        <p style="margin-top:10px">396 descriptions held by the Herzberg Institute of Astrophysics as
           “Reports on non-meteoric sightings”. The scientific file, kept after the 1967 transfer of
           responsibility. Fonds ISN 1017 / 4693.</p>
-        <div class="chips meta"><span class="chip chip-a">51 indexed</span></div>
+        <div class="chips meta"><span class="chip chip-a">396 indexed</span></div>
       </article>
       <article class="card reveal">
         <h3>RCMP</h3>
-        <p style="margin-top:10px">51 descriptions recorded as national research requests routed through
+        <p style="margin-top:10px">510 descriptions recorded as national research requests routed through
           police files, often citing the Radio and Electrical Engineering Division. Fonds ISN 37024.</p>
-        <div class="chips meta"><span class="chip chip-a">51 indexed</span></div>
+        <div class="chips meta"><span class="chip chip-a">510 indexed</span></div>
       </article>
     </div>
   </section>
@@ -108,6 +108,70 @@
   <section>
     <div class="sec-head reveal">
       <div class="sec-num">02</div>
+      <div class="sec-head-col">
+        <h2 class="sec-title">Why this index exists at all</h2>
+        <p class="sec-dek">Library and Archives Canada's UFO database is public, searchable and, for most
+          researchers, unusable as it stands. This is the specific reason.</p>
+      </div>
+    </div>
+    <div class="grid g-3">
+      <article class="card reveal">
+        <div class="readout-label">The cap</div>
+        <p style="margin-top:12px">Every query returns at most <strong>50 rows</strong>, whatever the
+          result set. There is no total count anywhere on the page, so the interface gives you no way to know
+          how much you are not seeing.</p>
+      </article>
+      <article class="card reveal">
+        <div class="readout-label">The broken pagination</div>
+        <p style="margin-top:12px">The <code>sk</code> parameter looks like an offset and it is not. Page two
+          jumps to the <em>last</em> fifty records, and every page after that returns those same fifty
+          records again. Paging through the National Research Council file yields fifty-one distinct records
+          and then repeats forever.</p>
+      </article>
+      <article class="card reveal">
+        <div class="readout-label">The workaround</div>
+        <p style="margin-top:12px">The only way deeper is to vary the query. AURORA runs <strong>59 of
+          them</strong>: four record groups, eleven provinces, and all forty-four province-by-group pairings,
+          then takes the union. That turns 207 visible records into 1,510.</p>
+      </article>
+    </div>
+    <div class="quote reveal" style="margin-top:24px">
+      <blockquote>A single query returns the first fifty rows and the last fifty rows, and nothing in
+        between. The archive was never incomplete. It was just not reachable through the interface that
+        describes it.</blockquote>
+      <cite>Measured against the live database, September 2026 · reproducible with the query patterns below</cite>
+    </div>
+    <div class="grid g-2" style="margin-top:24px">
+      <div class="prose reveal">
+        <p><strong>What this means for the numbers on this site.</strong> 1,510 is a floor, not a total.
+          Every description LAC holds that can be reached by varying the query is here, and the collection
+          itself is documented at roughly 9,500 documents. The gap between those two numbers is not lost
+          data in any meaningful sense; it is the part of the collection that no combination of the interface's
+          own query fields exposes.</p>
+        <p><strong>What the index is honest about.</strong> Of 1,510 descriptions, 1,357 carry a document
+          date and 1,311 name a location. Sighting dates are free text and largely absent, which is LAC's own
+          caveat, not an artefact of this scrape. Where a field is empty, the table says so rather than
+          guessing.</p>
+      </div>
+      <div class="card reveal">
+        <h3>One record, found this way</h3>
+        <p style="margin-top:12px">The province query for Nova Scotia returns a description that the
+          record-group query for National Defence never shows: an intelligence file whose location field
+          reads <strong>Shelburne County, NS</strong> and whose microfilm is reel T-3291. Shelburne was the
+          site of a United States naval submarine-tracking installation, and the object in question is the
+          one that entered the water off Shag Harbour six kilometres away on 4 October 1967.</p>
+        <p style="margin-top:12px">That record is invisible to anyone who queries by department alone. It is
+          here because the scraper asked about Nova Scotia as well as about Defence.</p>
+        <div class="meta">
+          <a class="btn" href="case-shag-harbour.html">Read the Shag Harbour case file</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head reveal">
+      <div class="sec-num">03</div>
       <div class="sec-head-col">
         <h2 class="sec-title">The index</h2>
         <p class="sec-dek">Search any field, filter by record group, sort by date. “Not cited” means the
@@ -148,7 +212,7 @@
 
   <section>
     <div class="sec-head reveal">
-      <div class="sec-num">03</div>
+      <div class="sec-num">04</div>
       <div class="sec-head-col">
         <h2 class="sec-title">Query the live database yourself</h2>
         <p class="sec-dek">The LAC database is public and browsable. These are the query patterns that work —
@@ -157,16 +221,24 @@
     </div>
     <ul class="linklist reveal">
       <li><span class="bullet"></span><div>
-        <a href="https://www.collectionscanada.gc.ca/databases/ufo/001057-110.01-e.php?q7=National+Research+Council&interval=50&sk=0" target="_blank" rel="noopener">Browse by record group — National Research Council</a>
-        <div class="desc"><code>?q7=National+Research+Council</code> — the record-group term. Also works for <em>Department of National Defence</em>, <em>Department of Transport</em>, <em>Royal Canadian Mounted Police</em>.</div>
+        <a href="https://www.collectionscanada.gc.ca/databases/ufo/001057-110.01-e.php?q7=National+Research+Council&interval=50&sk=0" target="_blank" rel="noopener">Browse by record group: National Research Council</a>
+        <div class="desc"><code>?q7=National+Research+Council</code> sets the record group. Also works for <em>Department of National Defence</em>, <em>Department of Transport</em>, <em>Royal Canadian Mounted Police</em>.</div>
       </div></li>
       <li><span class="bullet"></span><div>
-        <a href="https://www.collectionscanada.gc.ca/databases/ufo/001057-110.01-e.php?q4=NB&sk=0" target="_blank" rel="noopener">Browse by province — New Brunswick</a>
-        <div class="desc"><code>?q4=NB</code> — the province or territory field. NB, NS, NL, PE, MB, ON, QC, BC, YT all return records.</div>
+        <a href="https://www.collectionscanada.gc.ca/databases/ufo/001057-110.01-e.php?q4=NB&sk=0" target="_blank" rel="noopener">Browse by province: New Brunswick</a>
+        <div class="desc"><code>?q4=NB</code> sets the province or territory. NB, NS, NL, PE, MB, ON, QC, BC, YT all return records.</div>
+      </div></li>
+      <li><span class="bullet"></span><div>
+        <a href="https://www.collectionscanada.gc.ca/databases/ufo/001057-110.01-e.php?q4=Nfld&interval=50&sk=0" target="_blank" rel="noopener">Browse by province — Newfoundland and Labrador</a>
+        <div class="desc"><code>?q4=Nfld</code>, not <code>?q4=NL</code>. LAC's province codes are their own: Newfoundland is <code>Nfld</code> and Prince Edward Island is <code>PEI</code>, and the standard abbreviations return nothing.</div>
+      </div></li>
+      <li><span class="bullet"></span><div>
+        <a href="https://www.collectionscanada.gc.ca/databases/ufo/001057-110.01-e.php?q4=NB&q7=Royal+Canadian+Mounted+Police&interval=50&sk=0" target="_blank" rel="noopener">Browse by province and record group together</a>
+        <div class="desc"><code>?q4=NB&amp;q7=Royal+Canadian+Mounted+Police</code> — the pairing that reaches records no single query returns. This is the shape of all forty-four matrix queries behind this index.</div>
       </div></li>
       <li><span class="bullet"></span><div>
         <a href="https://recherche-research.bac-lac.gc.ca/eng/public/list/43130" target="_blank" rel="noopener">Curated guide — 1967 Shag Harbour sighting and related research</a>
-        <div class="desc">LAC's own research guide assembles the Shag Harbour material, with volume and microfilm references. This is the single best starting point for a specific case.</div>
+        <div class="desc">LAC's own research guide assembles the Shag Harbour material, with volume and microfilm references.. This is the single best starting point for a specific case.</div>
       </div></li>
       <li><span class="bullet"></span><div>
         <a href="https://www.canada.ca/en/library-archives/collection/research-help/science-technology/ufos.html" target="_blank" rel="noopener">LAC scope page — Canada's UFOs: the search for the unknown</a>
@@ -189,7 +261,7 @@
     <div>
       <h4>Machine-readable</h4>
       <ul>
-        <li><a href="data/lac.json">lac.json — 207 records</a></li>
+        <li><a href="data/lac.json">lac.json — 1,510 records</a></li>
         <li><a href="llms.txt">llms.txt</a></li>
       </ul>
     </div>
