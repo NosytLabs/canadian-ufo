@@ -7,6 +7,11 @@
 window.Aurora = (function () {
   "use strict";
 
+  // Marks the document as script-enabled. base.css uses it to hide the
+  // "Loading ..." placeholders when JS is off, where they would otherwise sit
+  // next to a <noscript> note explaining that nothing is coming.
+  document.documentElement.className += " js";
+
   function ready(fn) {
     if (document.readyState !== "loading") fn();
     else document.addEventListener("DOMContentLoaded", fn);

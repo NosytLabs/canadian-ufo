@@ -113,6 +113,10 @@ body {
 /* --------------------------------------------------------------------- hero */
 .hero { position: relative; padding: clamp(56px, 9vw, 108px) clamp(16px, 4vw, 40px) clamp(40px, 6vw, 72px); }
 .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.32fr) minmax(0, 0.68fr); gap: clamp(28px, 4vw, 56px); align-items: center; }
+/* A hero with no side panel. The 940px query below already collapses to one
+   column on narrow screens, so this only has to handle the wide case -- which
+   is why it was previously an inline style repeated across every page. */
+.hero-1col { grid-template-columns: minmax(0, 1fr); }
 .kicker {
   display: block; margin: 0 0 22px;
   font: 500 11.5px/1.5 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);
@@ -270,7 +274,10 @@ section:first-of-type { border-top: 0; }
   padding: 0 15px; border-radius: 999px; border: 1px solid var(--line); background: rgba(148, 176, 214, 0.07);
   backdrop-filter: blur(10px);
 }
-.search input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--text); font: 400 14px var(--sans); padding: 12px 0; }
+.search input { flex: 1; min-width: 0; background: none; border: 0; color: var(--text); font: 400 14px var(--sans); padding: 12px 0; }
+/* No outline:0 here -- :focus-visible below supplies the ring, and removing the
+   UA default outright costs keyboard users the focus indicator in any engine
+   that does not support it. */
 .search input::placeholder { color: var(--faint); }
 .search svg { flex: 0 0 auto; opacity: .5; }
 .seg { display: flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid var(--line); background: rgba(148, 176, 214, 0.06); overflow-x: auto; max-width: 100%; }
@@ -285,9 +292,10 @@ section:first-of-type { border-top: 0; }
 }
 .count-note { font: 400 12.5px/1 var(--mono); color: var(--faint); margin-left: auto; }
 
-/* The filter <select>s set appearance:none inline so they can match .chip;
-   without a caret of their own they read as static text. */
-select.chip {
+/* The filter <select>s hide the native control so they can match .chip; without
+   a caret of their own they then read as static text. */
+select.select-chip { padding: 11px 14px; }
+select.chip, select.select-chip {
   appearance: none; -webkit-appearance: none; cursor: pointer; color: var(--text-soft);
   padding-right: 32px !important;
   background-image:
@@ -439,6 +447,9 @@ footer { border-top: 1px solid var(--line); padding: 46px clamp(16px, 4vw, 40px)
 .noscript-note b { color: #ffe9c2; }
 .noscript-note a { color: #ffd894; }
 .spinner { padding: 40px; text-align: center; font: 400 13px var(--mono); color: var(--faint); }
+/* Without JS these are never replaced, and they read as a page stuck loading
+   right above the note that says so. core.js sets .js when it runs. */
+html:not(.js) .spinner { display: none; }
 .error-note { padding: 18px 20px; border-radius: var(--r-sm); border: 1px solid rgba(225,29,72,.3); background: var(--red-soft); color: #ffc4d0; font-size: 13.4px; }
 
 /* Basemap: OpenStreetMap tiles inverted into the dark theme. Vector overlays

@@ -221,6 +221,13 @@ releases = [
                   "the other endpoints that return Canada's UAP record today."},
 ]
 
+if not lac:
+    raise SystemExit("build_site_data: the LAC index is empty (0 descriptions). "
+                     "Refusing to publish an archive index with nothing in it.")
+if not docs:
+    raise SystemExit("build_site_data: no release documents were found. "
+                     "Refusing to publish.")
+
 w(os.path.join(DATA, "releases.json"), {"releases": releases, "documents": docs})
 
 print("documents:", len(docs), "| lac records:", len(lac))

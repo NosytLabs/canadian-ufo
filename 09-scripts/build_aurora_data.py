@@ -13,8 +13,18 @@ os.makedirs(DATA, exist_ok=True)
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 
 
+# Anything the site cannot render without. If a scrape comes back empty the
+# build used to carry on, write an empty file and exit 0 -- publishing a site
+# with nothing in it and no error anywhere.
+MUST_NOT_BE_EMPTY = {"cases.json", "timeline.json", "endpoints.json", "media.json",
+                     "survey.json", "canada.json"}
+
+
 def w(name, obj):
     p = os.path.join(DATA, name)
+    if name in MUST_NOT_BE_EMPTY and not obj:
+        raise SystemExit("build_aurora_data: %s came back empty. Refusing to write it -- "
+                         "check the scrape or the upstream source before publishing." % name)
     with open(p, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, separators=(",", ":"))
     print("wrote %-20s %8d bytes" % (name, os.path.getsize(p)))
@@ -650,14 +660,47 @@ ENDPOINTS = [
 # Ufology Research, The Canadian UFO Survey. The 2024 edition is the successor to the
 # retired Canadian UFO Survey series; ufologyresearch.ca no longer resolves, so the
 # current edition is served from the publisher's document host.
+# Ufology Research's Canadian UFO Survey. This file is the single source for
+# every survey figure on the site: index.html renders the cards from it, and
+# llms.txt advertises it. It used to be a three-row stub that still repeated the
+# "largest edition yet" claim the prose had already been corrected on.
+#
+# The record is 1,982 reports in 2012; 1,052 in 2025 is the biggest year since
+# 2020 and the fifth highest of the series. Any note that implies otherwise is
+# wrong.
 SURVEY = [
-    {"year": "2023", "reports": 570, "unexplained": None, "note": "The figure the Sky Canada Project report cites."},
+    {"year": "2012", "reports": 1982, "note": "The record for the survey's history."},
+    {"year": "2019", "reports": 849},
+    {"year": "2020", "reports": 1243},
+    {"year": "2021", "reports": 722},
+    {"year": "2022", "reports": 768},
+    {"year": "2023", "reports": 570, "note": "The figure the Sky Canada Project report cites."},
     {"year": "2024", "reports": 1008, "unexplained_pct": 3.77, "explained_pct": 14,
      "note": "Fewer than four per cent unexplained."},
     {"year": "2025", "reports": 1052, "unexplained_pct": 3.42, "explained_pct": 16.83,
      "probable_pct": 33.46, "insufficient_pct": 46.29,
-     "note": "One report every eight hours. The largest edition yet - and the unexplained share is falling, not rising."},
+     "long_run_unexplained_pct": 10.22,
+     "nocturnal_pct": 50.24,
+     "top_shape": "point source of light",
+     "top_shape_pct": 52,
+     "disc_reports": 52,
+     "avg_duration_min": 47,
+     "prev_avg_duration_min": {"2024": 36, "2023": 16, "2022": 13},
+     "by_province": {"ON": 307, "QC": 210, "BC": 131},
+     "note": ("One report every eight hours, the biggest year since 2020 and the fifth highest "
+              "on record. 36 of the 1,052 were unexplained, against a 10.22% average over the "
+              "preceding 35 years. The survey's own caveat: a report of 'unknown' does not imply "
+              "alien visitation.")},
 ]
+
+# The series runs since 1989 and totals more than 24,000 reports.
+SURVEY_META = {
+    "publisher": "Ufology Research",
+    "series_url": "https://img1.wsing.com/blobby/go/c23c8b29-268f-4742-a45e-2dba156b0e52/final%20-%20The%202025%20Canadian%20UFO%20Survey.pdf",
+    "since": 1989,
+    "catalogued_total": 24000,
+    "prior_years": [2019, 2020, 2021, 2022, 2023, 2024],
+}
 
 if __name__ == "__main__":
     build_geometry()
@@ -670,5 +713,5 @@ if __name__ == "__main__":
     w("media.json", MEDIA)
     w("podcasts.json", PODCASTS)
     w("endpoints.json", ENDPOINTS)
-    w("survey.json", SURVEY)
+    w("survey.json", {"meta": SURVEY_META, "years": SURVEY})
     print("done")

@@ -58,7 +58,7 @@
 
 <main id="main">
   <section class="hero" style="padding-bottom:8px">
-    <div class="hero-inner" style="grid-template-columns:1fr">
+    <div class="hero-inner hero-1col">
       <div>
         <p class="kicker">Archival index · 1,510 descriptions · 59 queries · 4 record groups</p>
         <h1 style="font-size:clamp(36px,6vw,70px)">The whole index, in one table</h1>
@@ -194,10 +194,10 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input id="arc-search" type="search" placeholder="Search titles, dates, locations, record numbers…" aria-label="Search the archival index">
       </label>
-      <select id="arc-group" class="chip" aria-label="Filter by record group" style="appearance:none;padding:11px 14px;border-radius:999px">
+      <select id="arc-group" class="chip select-chip" aria-label="Filter by record group">
         <option value="all">All record groups</option>
       </select>
-      <span class="count-note" id="arc-count">—</span>
+      <span class="count-note" id="arc-count" aria-live="polite">—</span>
     </div>
 
     <div class="table-wrap">
@@ -214,7 +214,7 @@
             <th scope="col">Source</th>
           </tr>
         </thead>
-        <tbody id="arc-body"><tr><td colspan="7"><p class="spinner">Loading the archival index…</p></td></tr></tbody>
+        <tbody id="arc-body" aria-live="polite"><tr><td colspan="7"><p class="spinner">Loading the archival index…</p></td></tr></tbody>
       </table>
     </div>
     <div class="filters" id="arc-pager" style="margin-top:20px"></div>

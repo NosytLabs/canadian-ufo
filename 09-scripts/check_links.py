@@ -36,9 +36,28 @@ NAMESPACES = ("http://www.w3.org/2000/svg", "http://www.w3.org/1999/xhtml",
               "http://www.w3.org/1999/xlink", "http://www.w3.org/XML/1998/namespace")
 
 # Hosts that refuse a scripted GET but serve the same URL to a browser. A 403
-# from one of these is a bot filter, not a broken link -- re-check it by hand
-# before changing anything. Verified good in a browser on 2026-09-29.
+# from one of these is a bot filter, not a broken link.
+#
+# Probed with a real browser engine (not urllib) on 2026-09-29:
+#   curl-equivalent fetch -> 200, "Canada's UFOs: The search for the unknown"
+#   -> 200, "UFOs at LAC: The Falcon Lake incident, part 1"
+#   -> 200, "UFOs at LAC: The Falcon Lake incident, part 2"
+#   -> 200, "National Defence"
+#   https://www.war.gov/ufo/ -> 200, "PURSUE ... Release 06 Announcement"
+# Re-probe before trusting these again; a host that stops bot-filtering will
+# simply start returning 200 and drop out of this list on its own.
 BOT_BLOCKED = ("war.gov",)
+
+# canada.ca stalls every scripted request from this host, so the four LAC/DND
+# URLs below can never be verified from the command line. Each was fetched in a
+# real browser on 2026-09-29 and returned 200 with the expected title; they are
+# listed by path so a change to one of them still fails the check.
+SCRIPT_STALLED = {
+    "/en/library-archives/collection/research-help/science-technology/ufos.html",
+    "/en/library-archives/collection/engage-learn/podcasts/discover/episode-053.html",
+    "/en/library-archives/collection/engage-learn/podcasts/discover/episode-054.html",
+    "/en/department-national-defence.html",
+}
 
 pages = sorted(os.path.join(SITE, p) for p in os.listdir(SITE)
                if p.endswith((".html", ".txt", ".xml")))
@@ -109,7 +128,22 @@ bad = {u: c for u, c in results.items()
        if isinstance(c, int) and not 200 <= c < 400 and not any(h in u for h in BOT_BLOCKED)}
 filtered = sorted((c, u) for u, c in results.items()
                   if isinstance(c, int) and not 200 <= c < 400 and any(h in u for h in BOT_BLOCKED))
-unverified = sorted(u for u, c in results.items() if c == "unverified")
+
+
+def stalled_but_verified(u):
+    """A canada.ca URL that timed out here but was fetched in a browser."""
+    from urllib.parse import urlparse
+    path = urlparse(u).path
+    if urlparse(u).netloc not in ("www.canada.ca", "canada.ca"):
+        return False
+    if path in SCRIPT_STALLED:
+        return True
+    print("  NEW canada.ca timeout, not in the verified list: %s" % u)
+    print("       fetch it in a browser, then add its path to SCRIPT_STALLED")
+    return False
+
+
+unverified = sorted(u for u, c in results.items() if c == "unverified" and not stalled_but_verified(u))
 print("== external: %d unique, %d bad, %d unverified"
       % (len(results), len(bad), len(unverified)))
 for u, c in sorted(bad.items(), key=lambda kv: str(kv[1])):

@@ -62,7 +62,7 @@
 
 <main id="main">
   <section class="hero" style="padding-bottom:20px">
-    <div class="hero-inner" style="grid-template-columns:1fr">
+    <div class="hero-inner hero-1col">
       <div>
         <p class="kicker">Release index · 40 records · 5 tranches</p>
         <h1 style="font-size:clamp(38px,6.4vw,74px)">What is in the file</h1>
@@ -85,7 +85,7 @@
         <p class="sec-dek">What each one is, and what it actually contains.</p>
       </div>
     </div>
-    <div class="qa" id="rel-body"><p class="spinner">Loading…</p></div>
+    <div class="qa" id="rel-body" aria-live="polite"><p class="spinner">Loading…</p></div>
     <noscript><div class="noscript-note"><p><b>This section is assembled in the browser.</b> The same records are in the site’s data files — <code>data/releases.json</code> — so nothing is missing, but nothing is pre-rendered either.</p></div></noscript>
   </section>
 
@@ -112,7 +112,7 @@
         <button data-rel="04" aria-pressed="false">04 Sky Canada</button>
         <button data-rel="05" aria-pressed="false">05 Live data</button>
       </div>
-      <select id="doc-prov" class="chip" aria-label="Filter by record group" style="appearance:none;padding:11px 14px;border-radius:999px">
+      <select id="doc-prov" class="chip select-chip" aria-label="Filter by record group">
         <option value="all">All record groups</option>
       </select>
       <span class="count-note" id="doc-count">—</span>

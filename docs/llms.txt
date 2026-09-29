@@ -46,7 +46,14 @@ the live open-data endpoints that serve the record today.
 - /data/releases.json : 40 release records
 - /data/lac.json : 1,510 archival descriptions with source URLs
 - /data/cases.json : 18 case files with coordinates and source links
-- /data/timeline.json, /data/media.json, /data/podcasts.json, /data/endpoints.json, /data/survey.json
+- /data/timeline.json : the record year by year, 1947 to now
+- /data/media.json, /data/podcasts.json : video and audio, with links to the case each documents
+- /data/endpoints.json : the verified government endpoint list, as data rather than prose
+- /data/survey.json : the Canadian UFO Survey series. {"meta": {since, catalogued_total, series_url},
+  "years": [{year, reports, unexplained_pct, ...}]}. This is the single source for every survey
+  figure on the site; the 2025 row carries the full breakdown, the 35-year average and the
+  provincial counts. The series record is 1,982 reports (2012) -- 1,052 in 2025 is the biggest
+  year since 2020, not the largest on record.
 - /data/canada.json : Natural Earth province boundaries (public domain)
 
 ## Conventions

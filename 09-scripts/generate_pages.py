@@ -235,7 +235,7 @@ def case_page(c, all_cases, media):
         title=esc(title), desc=esc(desc), base=BASE, slug=c["slug"],
         jsonld=jsonld, nav=nav("case.html")) + f"""
   <section class="hero" style="padding-bottom:8px">
-    <div class="hero-inner" style="grid-template-columns:1fr">
+    <div class="hero-inner hero-1col">
       <div>
         <p class="kicker">Case file · {esc(c.get('region', 'Canada'))} · {esc(label)}</p>
         <h1 style="font-size:clamp(34px,5.6vw,64px)">{esc(c['title'])}</h1>
@@ -263,7 +263,7 @@ def case_page(c, all_cases, media):
           <p style="margin:10px 0 0;font-size:13.6px">{esc(caveat)}</p>
         </div>
       </div>
-      <aside class="card" style="position:sticky;top:96px">
+      <aside class="card" style="position:sticky;top:calc(var(--head-h) + 16px)">
         <h3>Primary sources</h3>
         <ul class="linklist" style="margin-top:14px">
 {docs}
@@ -342,7 +342,14 @@ the live open-data endpoints that serve the record today.
 - /data/releases.json : 40 release records
 - /data/lac.json : 1,510 archival descriptions with source URLs
 - /data/cases.json : 18 case files with coordinates and source links
-- /data/timeline.json, /data/media.json, /data/podcasts.json, /data/endpoints.json, /data/survey.json
+- /data/timeline.json : the record year by year, 1947 to now
+- /data/media.json, /data/podcasts.json : video and audio, with links to the case each documents
+- /data/endpoints.json : the verified government endpoint list, as data rather than prose
+- /data/survey.json : the Canadian UFO Survey series. {"meta": {since, catalogued_total, series_url},
+  "years": [{year, reports, unexplained_pct, ...}]}. This is the single source for every survey
+  figure on the site; the 2025 row carries the full breakdown, the 35-year average and the
+  provincial counts. The series record is 1,982 reports (2012) -- 1,052 in 2025 is the biggest
+  year since 2020, not the largest on record.
 - /data/canada.json : Natural Earth province boundaries (public domain)
 
 ## Conventions
@@ -520,11 +527,22 @@ def rewrite_map_table(cases):
             "<td>%.2f, \u2212%.2f</td><td><span class=\"chip %s\">%s</span></td></tr>"
             % (esc(c.get("display") or c["date"]), c["slug"], esc(c["title"]),
                esc(c.get("prov") or "Canada"), esc(c.get("region") or ""),
-               c["lat"], c["lon"], chip, esc(label)))
+               c["lat"], abs(c["lon"]), chip, esc(label)))
     html = open(path, encoding="utf-8").read()
-    start = html.index('<table id="arc-table-map">')
-    tstart = html.index("<tbody>", start)
-    tend = html.index("</tbody>", tstart)
+    # A bare .index() here raised ValueError with no context, and because this
+    # runs after the 18 case pages are already written, that left site/ half
+    # regenerated with no clue what had gone wrong.
+    try:
+        start = html.index('<table id="arc-table-map">')
+        tstart = html.index("<tbody>", start)
+        tend = html.index("</tbody>", tstart)
+    except ValueError as e:
+        raise SystemExit(
+            "rewrite_map_table: could not find the case table in map.html (%s).\n"
+            "  The <table id=\"arc-table-map\"> / <tbody> markers must be present and\n"
+            "  unique for the table to be generated." % e)
+    if tstart < start:
+        raise SystemExit("rewrite_map_table: the <tbody> found precedes the table marker.")
     out = html[:tstart + len("<tbody>\n")] + "\n".join(rows) + html[tend:]
     open(path, "w", encoding="utf-8").write(out)
 

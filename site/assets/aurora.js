@@ -25,11 +25,19 @@
       });
     }
 
-    // FAQ accordions: all open by default for crawlers, first one closed on narrow screens
-    $$(".qa details").forEach(function (d, i) {
-      if (!singleColumn()) d.open = true;
-      else d.open = i === 0;
-    });
+    // FAQ accordions: open by default for crawlers and on wide screens, first
+    // one only on narrow. The state used to be set once at load, so crossing the
+    // breakpoint left every answer collapsed (or every answer open) until a
+    // reload.
+    var faqs = $$(".qa details");
+    function setFaqState(isSingle) {
+      faqs.forEach(function (d, i) { d.open = isSingle ? i === 0 : true; });
+    }
+    // The breakpoint string lives in core.js, next to the CSS it mirrors.
+    var faqMQ = window.matchMedia("(max-width: 940px)");
+    setFaqState(singleColumn());
+    if (faqMQ.addEventListener) faqMQ.addEventListener("change", function (e) { setFaqState(e.matches); });
+    else if (faqMQ.addListener) faqMQ.addListener(function (e) { setFaqState(e.matches); });
   });
 
   /* ------------------------------------------------------------ releases */
@@ -177,8 +185,19 @@
     var body = $("#arc-body");
     if (!body) return;
     var rows = [], q = "", grp = "all", sortKey = "doc_date", sortDir = 1, page = 0, PER = 25;
-    fetchJSON("data/lac.json").then(function (r) { rows = r; wire(); })
-      .catch(function (e) { body.innerHTML = '<div class="error-note">Could not load the index: ' + e.message + "</div>"; });
+    fetchJSON("data/lac.json").then(function (r) {
+      // Precompute the search haystack once. Building it inside matches() meant
+      // six field joins and a toLowerCase for each of 1,510 rows on every
+      // keystroke of the search box.
+      r.forEach(function (x) {
+        x._hay = [x.doc_title, x.record_group, x.doc_date, x.sighting_date, x.location, x.rid]
+          .join(" ").toLowerCase();
+      });
+      rows = r;
+      wire();
+    }).catch(function (e) {
+      body.innerHTML = '<div class="error-note">Could not load the index: ' + e.message + "</div>";
+    });
 
     function grpOf(r) { return r.record_group; }
     function dateVal(r) {
@@ -190,8 +209,7 @@
     function matches(r) {
       if (grp !== "all" && grpOf(r) !== grp) return false;
       if (!q) return true;
-      return [r.doc_title, r.record_group, r.doc_date, r.sighting_date, r.location, r.rid]
-        .join(" ").toLowerCase().indexOf(q) >= 0;
+      return r._hay.indexOf(q) >= 0;
     }
 
     function draw() {
@@ -240,8 +258,6 @@
     }
 
     function wire() {
-      var groups = {};
-      rows.forEach(function (r) { groups[r.record_group] = 1; });
       var sel = $("#arc-group");
       if (sel) {
         var tally = Object.create(null);
@@ -418,6 +434,72 @@
     // third-party API the visitor did not ask about.
   }
 
+  /* ------------------------------------------------------ survey series */
+  /* Every survey figure on the site comes from data/survey.json. They used to
+     be typed into index.html as well, which is how the JSON kept saying "the
+     largest edition yet" after the prose had been corrected. */
+  function renderSurvey() {
+    var cards = $("#survey-cards"), stats = $("#survey-stats");
+    if (!cards) return;
+    fetchJSON("data/survey.json").then(function (d) {
+      var years = d.years || [], meta = d.meta || {};
+      var cur = years[years.length - 1] || {};
+      var peak = years.reduce(function (a, y) { return !a || y.reports > a.reports ? y : a; }, null);
+      var prior = years[years.length - 2] || {};
+      var third = years[years.length - 3] || {};
+      var fmt = function (n) { return Number(n).toLocaleString("en-CA"); };
+      var unexplainedCount = cur.unexplained_pct
+        ? Math.round(cur.reports * cur.unexplained_pct / 100) : null;
+
+      cards.innerHTML = [
+        ["Reports, " + cur.year, fmt(cur.reports),
+         "Roughly one every eight hours, up from " + fmt(prior.reports) + " in " + prior.year +
+         " and " + fmt(third.reports) + " in " + third.year + ". The biggest year since 2020" +
+         (peak ? " \u2014 and the record is " + fmt(peak.reports) + " in " + peak.year + "." : ".")],
+        ["Left unexplained", cur.unexplained_pct + "%",
+         fmt(unexplainedCount) + " of " + fmt(cur.reports) + " reports. Averaged over the survey's " +
+         "preceding 35 years the unexplained share is " + cur.long_run_unexplained_pct +
+         "%, so this is among the lowest readings it has ever posted."],
+        ["Insufficient evidence", cur.insufficient_pct + "%",
+         "The largest single bucket. " + cur.probable_pct + "% came back probable and " +
+         cur.explained_pct + "% explained. The survey is explicit that a report of \u201cunknown\u201d " +
+         "does not imply alien visitation."],
+        ["Pilot reports, 2023", "17",
+         "Occurrences pilots filed into Transport Canada's CADORS database that could be considered UAPs. " +
+         "CTV's count, cited in the Sky Canada report."]
+      ].map(function (c) {
+        return '<article class="card"><div class="readout-label">' + esc(c[0]) + "</div>" +
+          '<div class="figure" style="font-size:44px;margin-top:8px">' + esc(c[1]) + "</div>" +
+          '<p style="margin-top:10px">' + c[2] + "</p></article>";
+      }).join("");
+
+      var prov = cur.by_province || {};
+      stats.innerHTML = [
+        [cur.nocturnal_pct + "%", "were nocturnal lights \u2014 the single largest category of description, above anything conventionally called a disc or a craft."],
+        [String(cur.disc_reports), "reports described a \u201cdisc\u201d, about 5% of the year. The most common single shape was a " + esc(cur.top_shape) + ", at " + cur.top_shape_pct + "%."],
+        [cur.avg_duration_min + " min", "average reported duration, up from " + (cur.prev_avg_duration_min || {})["2024"] + " minutes in 2024 and " + (cur.prev_avg_duration_min || {})["2023"] + " in 2023."],
+        [[prov.ON, prov.QC, prov.BC].join(" / "), "reports from Ontario, Quebec and British Columbia \u2014 the three provinces that account for most of the Canadian total."]
+      ].map(function (s) {
+        return '<div class="stat"><b>' + s[0] + "</b><span>" + s[1] + "</span></div>";
+      }).join("");
+
+      // the series itself, for anyone who wants the numbers rather than the story
+      if (meta.series_url) {
+        var foot = document.createElement("p");
+        foot.className = "prose";
+        foot.style.marginTop = "18px";
+        foot.innerHTML = "The full " + esc(cur.year) + " edition is a " +
+          '<a href="' + esc(meta.series_url) + '" target="_blank" rel="noopener">PDF from Ufology Research</a>' +
+          ". The series has run since " + esc(meta.since) + " and has catalogued more than " +
+          fmt(meta.catalogued_total) + " reports.";
+        cards.parentNode.insertBefore(foot, stats);
+      }
+    }).catch(function (e) {
+      cards.innerHTML = '<div class="error-note">Could not load the survey series: ' + e.message +
+        ". The figures are in <code>data/survey.json</code>.</div>";
+    });
+  }
+
   /* ------------------------------------------------------------ timeline */
   function renderTimeline() {
     var host = $("#tl");
@@ -435,6 +517,6 @@
 
   ready(function () {
     renderDocs(); renderArchive(); renderCases(); renderMedia();
-    renderEndpoints(); wireCkan(); renderTimeline();
+    renderEndpoints(); wireCkan(); renderTimeline(); renderSurvey();
   });
 })();

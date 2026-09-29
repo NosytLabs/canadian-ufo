@@ -58,7 +58,7 @@
 
 <main id="main">
   <section class="hero" style="padding-bottom:8px">
-    <div class="hero-inner" style="grid-template-columns:1fr">
+    <div class="hero-inner hero-1col">
       <div>
         <p class="kicker">Media · 12 verified video items · 2 podcast episodes</p>
         <h1 style="font-size:clamp(36px,6vw,70px)">What Canada actually broadcast</h1>
@@ -81,7 +81,7 @@
         <p class="sec-dek">News, archives and documentary. Each card links to the case it documents.</p>
       </div>
     </div>
-    <div class="grid g-3" id="media-grid"><p class="spinner">Loading the media index…</p></div>
+    <div class="grid g-3" id="media-grid" aria-live="polite"><p class="spinner">Loading the media index…</p></div>
     <noscript><div class="noscript-note"><p><b>This section is assembled in the browser.</b> The same records are in the site’s data files — <code>data/media.json</code> — so nothing is missing, but nothing is pre-rendered either.</p></div></noscript>
   </section>
 

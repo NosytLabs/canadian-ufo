@@ -4,11 +4,8 @@
 
   // Keyless OSM tiles. The dark look comes from a CSS filter on the tile pane
   // (see base.css), which also means no API key can expire and break the map.
-  var TILES = [
-    { name: "OpenStreetMap", url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-      sub: "", max: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
-  ];
+  var TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+  var TILE_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   var CONF = {
     primary:  { label: "Archival or official record", color: "#5fd4e8", r: 8 },
@@ -40,13 +37,11 @@
         });
         L.control.zoom({ position: "topright" }).addTo(map);
 
-        TILES.forEach(function (t) {
-          L.tileLayer(t.url, {
-            maxZoom: t.max,
-            attribution: t.attribution,
-            crossOrigin: true
-          }).addTo(map);
-        });
+        L.tileLayer(TILE_URL, {
+          maxZoom: 19,
+          attribution: TILE_ATTR,
+          crossOrigin: true
+        }).addTo(map);
 
         function styleFor(provName) {
           var isTerr = /nunavut|northwest|yukon|quebec|newfoundland|labrador/i.test(provName || "");
@@ -62,7 +57,7 @@
         }
 
         var provinces = L.geoJSON(geo, {
-          style: function (f) { return styleFor(f.properties.name); },
+          style: function (f) { return styleFor(f.properties && f.properties.name); },
           onEachFeature: function (f, layer) {
             var p = f.properties;
             if (p && p.name) {
@@ -146,14 +141,13 @@
           if (history.replaceState) {
             history.replaceState(null, "", "#" + slug);
           }
+          // index.html also renders the case cards, so a selection made on the
+          // map can scroll to and highlight the matching one.
           var card = findBy(document, "caseCard", slug);
           if (card && !fromList) {
             card.scrollIntoView({ block: "center", behavior: "smooth" });
             card.classList.add("is-open");
           }
-          // No-op on index.html and map.html: the open-* cards are only on
-          // case.html, which does not load this file. Kept because a future
-          // inline map on the case page would want it.
         }
 
         /* Deep link. Every case page's "view on map" chip links to
