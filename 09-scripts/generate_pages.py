@@ -4,12 +4,14 @@
 Stable per-record URLs are the single biggest citability win for a static archive, so each
 case gets its own document with its own title, description, and JSON-LD.
 """
-import json, os, datetime
+import json, os, datetime, re
+from html import unescape
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, "site")
 DATA = os.path.join(SITE, "data")
 BASE = "https://nosytlabs.github.io/canadian-ufo"
+TODAY = datetime.date.today().isoformat()
 
 CONF = {
     "primary": ("Archival or official record", "chip-a",
@@ -24,6 +26,16 @@ NAV = [
     ("index.html", "Overview"), ("releases.html", "Releases"), ("archive.html", "Archive index"),
     ("case.html", "Case files"), ("map.html", "Map"), ("media.html", "Media"), ("data.html", "Open data"),
 ]
+
+
+def trim(text, limit):
+    """Cut to a whole word inside `limit`, so a meta description is not
+    truncated mid-word by a search engine."""
+    text = " ".join(str(text).split())
+    if len(text) <= limit:
+        return text
+    cut = text[:limit].rsplit(" ", 1)[0].rstrip(" ,;:.\u2014-")
+    return cut + "\u2026"
 
 
 def esc(s):
@@ -52,8 +64,18 @@ HEAD = """<!DOCTYPE html>
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{base}/case-{slug}.html">
+<meta property="og:image" content="{base}/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AURORA — Canada&#39;s declassified UAP record, indexed">
+<meta property="og:site_name" content="AURORA">
+<meta property="og:locale" content="en_CA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{desc}">
+<meta name="twitter:image" content="{base}/assets/og.png">
 <link rel="stylesheet" href="assets/base.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304060c'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%2322d3ee' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%234ade80'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304060c'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%235fd4e8' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%235fd4e8'/%3E%3C/svg%3E">
 <script type="application/ld+json">
 {jsonld}
 </script>
@@ -82,7 +104,7 @@ FOOT = """</main>
 <footer>
   <div class="foot-inner">
     <div>
-      <h4>Case files</h4>
+      <h2>Case files</h2>
       <ul>
         <li><a href="case.html">All eighteen cases</a></li>
         <li><a href="map.html">Case map</a></li>
@@ -90,7 +112,7 @@ FOOT = """</main>
       </ul>
     </div>
     <div>
-      <h4>Machine-readable</h4>
+      <h2>Machine-readable</h2>
       <ul>
         <li><a href="data/cases.json">cases.json</a></li>
         <li><a href="llms.txt">llms.txt</a></li>
@@ -98,7 +120,7 @@ FOOT = """</main>
       </ul>
     </div>
     <div>
-      <h4>Related media</h4>
+      <h2>Related media</h2>
       <ul>
         <li><a href="media.html">Documentaries and news film</a></li>
       </ul>
@@ -110,6 +132,7 @@ FOOT = """</main>
   </div>
 </footer>
 </div>
+<script src="assets/core.js"></script>
 <script src="assets/aurora.js"></script>
 </body>
 </html>
@@ -135,7 +158,7 @@ def player(m):
                  '<span class="pm">CBC player &middot; click to load</span>'
                  '<a href="%s" target="_blank" rel="noopener" class="poster-link"'
                  ' aria-label="Play: %s"></a>' % (m["src"], esc(m["title"])))
-    return """<article class="card reveal">
+    return """<article class="card">
           <div class="card-media%s">%s</div>
           <h3>%s</h3>
           <p class="meta" style="color:var(--muted);font-size:12.5px">%s &middot; %s%s</p>
@@ -149,7 +172,7 @@ def player(m):
 def case_page(c, all_cases, media):
     label, chip, caveat = CONF.get(c["conf"], CONF["partial"])
     title = "%s, %s (%s) — Canadian UAP case file" % (c["title"], c.get("prov", "Canada"), c["date"][:4])
-    desc = c["summary"][:300]
+    desc = trim(c["summary"], 155)
 
     jsonld = json.dumps({
         "@context": "https://schema.org",
@@ -158,9 +181,11 @@ def case_page(c, all_cases, media):
              "@id": "%s/case-%s.html#article" % (BASE, c["slug"]),
              "headline": title,
              "description": desc,
-             "datePublished": "2026-09-29",
-             "dateModified": "2026-09-29",
+             "datePublished": TODAY,
+             "dateModified": TODAY,
              "inLanguage": "en-CA",
+             "author": {"@type": "Organization", "name": "AURORA", "url": "%s/" % BASE},
+             "image": "%s/assets/og.png" % BASE,
              "articleSection": "UAP case file",
              "about": {"@type": "Place",
                        "name": "%s, %s" % (c["title"], c.get("prov", "Canada")),
@@ -172,11 +197,7 @@ def case_page(c, all_cases, media):
                 {"@type": "ListItem", "position": 1, "name": "AURORA", "item": "%s/" % BASE},
                 {"@type": "ListItem", "position": 2, "name": "Case files", "item": "%s/case.html" % BASE},
                 {"@type": "ListItem", "position": 3, "name": c["title"], "item": "%s/case-%s.html" % (BASE, c["slug"])}]},
-            {"@type": "FAQPage", "mainEntity": [
-                {"@type": "Question", "name": "What happened at %s, %s?" % (c["title"], c.get("prov", "Canada")),
-                 "acceptedAnswer": {"@type": "Answer", "text": c["summary"]}},
-                {"@type": "Question", "name": "What is the sourcing quality for this case?",
-                 "acceptedAnswer": {"@type": "Answer", "text": "%s. %s" % (label, caveat)}}]},
+            {"@type": "Citation", "name": label, "text": caveat},
         ]
     }, ensure_ascii=False, indent=1)
 
@@ -189,7 +210,7 @@ def case_page(c, all_cases, media):
     media_section = ""
     if mine:
         media_section = """  <section>
-    <div class="sec-head reveal">
+    <div class="sec-head">
       <div class="sec-num">&#9654;</div>
       <div class="sec-head-col">
         <h2 class="sec-title">Watch and listen</h2>
@@ -223,7 +244,7 @@ def case_page(c, all_cases, media):
           {('<span class="chip">' + esc(c['prov']) + '</span>') if c.get('prov') else ''}
           {('<span class="chip">' + esc(c['tag']) + '</span>') if c.get('tag') else ''}
           <span class="chip">{'%.2f, %.2f' % (c['lat'], c['lon'])}</span>
-          <span class="chip chip-a map-link"><a href="map.html#' + esc(c['slug']) + '" style="color:inherit">view on map</a></span>
+          <span class="chip chip-a map-link"><a href="map.html#{esc(c['slug'])}" style="color:inherit">view on map</a></span>
         </div>
         {('<p style="color:var(--faint);font-size:12.5px;margin:12px 0 0">' + esc(c['date_note']) + '</p>') if c.get('date_note') else ''}
         <p class="hero-lede" style="margin-top:22px;max-width:64ch">{esc(c['summary'])}</p>
@@ -253,14 +274,14 @@ def case_page(c, all_cases, media):
 
 {media_section}
   <section>
-    <div class="sec-head reveal">
+    <div class="sec-head">
       <div class="sec-num">→</div>
       <div class="sec-head-col">
         <h2 class="sec-title">Other case files</h2>
         <p class="sec-dek">Eighteen cases in the Canadian record, graded by sourcing.</p>
       </div>
     </div>
-    <ul class="linklist reveal">
+    <ul class="linklist">
 {related}
     </ul>
     <p style="margin-top:24px"><a class="btn" href="case.html">All case files</a></p>
@@ -320,7 +341,7 @@ the live open-data endpoints that serve the record today.
 
 - /data/releases.json : 40 release records
 - /data/lac.json : 1,510 archival descriptions with source URLs
-- /data/cases.json : 12 case files with coordinates and source links
+- /data/cases.json : 18 case files with coordinates and source links
 - /data/timeline.json, /data/media.json, /data/podcasts.json, /data/endpoints.json, /data/survey.json
 - /data/canada.json : Natural Earth province boundaries (public domain)
 
@@ -360,6 +381,154 @@ Sitemap: __BASE__/sitemap.xml
 """
 
 
+# Pages that state the case count in prose. Hand-written pages are the only
+# place a count can rot: the data gained a case and the sentence did not.
+PROSE_COUNTS = [
+    ("index.html", "Eighteen case files with locations"),
+    ("map.html", "Eighteen Canadian UAP cases, mapped"),
+    ("map.html", "Eighteen Canadian UAP case locations"),
+    ("data.html", "18 case files with coordinates"),
+    ("llms.txt", "18 case files with coordinates"),
+    ("case.html", "eighteen Canadian UAP cases"),
+]
+
+# Numbers that came out of measuring the LAC browse interface. They live in
+# data/lac_counts.json, so check the prose against that rather than trusting it.
+LAC_PROSE = [
+    ("archive.html", "fifty distinct records", "National Research Council",
+     "yields fifty-one distinct records"),
+    ("archive.html", "206 visible records into 1,510", None, "207 visible records"),
+]
+
+WORDS = {12: "twelve", 18: "eighteen"}
+
+
+def assert_prose_counts(cases):
+    """Fail the build if a page states a case count the data does not support.
+
+    This is the class of bug that made map.html claim "twelve" while listing
+    eighteen, and llms.txt claim 12 while shipping 18. Cheap to check, and the
+    check is the only thing that stops it coming back.
+    """
+    n = len(cases)
+    for fn, expected in PROSE_COUNTS:
+        want = n if str(n) in expected or WORDS.get(n, "").lower() in expected.lower() else None
+        path = os.path.join(SITE, fn)
+        if not os.path.exists(path):
+            print("  WARN  %s: missing" % fn)
+            continue
+        txt = open(path, encoding="utf-8").read()
+        if expected not in txt:
+            raise SystemExit(
+                "generate_pages: %s no longer contains %r.\n"
+                "  Either the case count changed (%d now) or that sentence was edited -- "
+                "reconcile PROSE_COUNTS in this script with the page." % (fn, expected, n))
+        del want
+
+
+import re as _re
+
+_FAQ_RE = _re.compile(
+    r'<details>\s*<summary>(?P<q>.*?)</summary>\s*<div class="a">(?P<a>.*?)</div>\s*</details>',
+    _re.S)
+
+
+def _text_of(fragment):
+    """Flatten an HTML fragment to the string a reader actually sees."""
+    return re.sub(r"\s+", " ", unescape(_re.sub(r"<[^>]+>", " ", fragment))).strip()
+
+
+def sync_faq_structured_data():
+    """Rebuild index.html's FAQPage node from the FAQ that is actually visible.
+
+    The two had drifted apart completely -- the JSON-LD advertised seven
+    questions, the page showed six, and not one matched. Structured data has
+    to describe visible content or it is a lie to a crawler, so derive it.
+    """
+    path = os.path.join(SITE, "index.html")
+    html = open(path, encoding="utf-8").read()
+
+    start = html.index('id="faq"')
+    end = html.index("</section>", start)
+    faq_html = html[start:end]
+    pairs = [(unescape(_re.sub(r"<[^>]+>", "", m.group("q"))).strip(), _text_of(m.group("a")))
+             for m in _FAQ_RE.finditer(faq_html)]
+    if not pairs:
+        raise SystemExit("sync_faq_structured_data: found no visible FAQ on index.html")
+
+    lstart = html.index('<script type="application/ld+json">') + len('<script type="application/ld+json">')
+    lend = html.index("</script>", lstart)
+    block = json.loads(html[lstart:lend])
+
+    found = False
+    for node in block.get("@graph", []):
+        if node.get("@type") == "FAQPage":
+            node["mainEntity"] = [
+                {"@type": "Question", "name": q,
+                 "acceptedAnswer": {"@type": "Answer", "text": a}}
+                for q, a in pairs]
+            found = True
+    if not found:
+        raise SystemExit("sync_faq_structured_data: no FAQPage node in index.html's JSON-LD")
+
+    out = json.dumps(block, ensure_ascii=False, indent=2)
+    open(path, "w", encoding="utf-8").write(html[:lstart] + "\n" + out + "\n" + html[lend:])
+    print("synced FAQPage structured data from %d visible questions" % len(pairs))
+
+
+def assert_lac_prose():
+    """archive.html quotes two measured figures from data/lac_counts.json."""
+    counts_path = os.path.join(ROOT, "data", "lac_counts.json")
+    if not os.path.exists(counts_path):
+        return
+    counts = json.load(open(counts_path, encoding="utf-8"))
+    total = sum(counts.values())
+    words = {50: "fifty", 51: "fifty-one", 52: "fifty-two", 54: "fifty-four",
+             206: "206", 207: "207"}
+    nrc = counts.get("National Research Council")
+    if nrc is not None and words.get(nrc) not in ("fifty", "fifty-one"):
+        raise SystemExit("generate_pages: add a spelling for %r in WORDS" % nrc)
+    path = os.path.join(SITE, "archive.html")
+    txt = open(path, encoding="utf-8").read()
+    if nrc is not None:
+        want = "yields %s distinct records" % words.get(nrc, str(nrc))
+        if want not in txt:
+            raise SystemExit(
+                "generate_pages: archive.html should say %r -- lac_counts.json says the NRC "
+                "file yields %d distinct records. Update the page and LAC_PROSE." % (want, nrc))
+    want = "%d visible records into 1,510" % total
+    if want not in txt:
+        raise SystemExit(
+            "generate_pages: archive.html should say %r -- lac_counts.json sums to %d. "
+            "Update the page and LAC_PROSE." % (want, total))
+
+
+def rewrite_map_table(cases):
+    """Replace map.html's case table with one generated from cases.json.
+
+    The page promises "the same eighteen cases, in text. No JavaScript needed",
+    so this stays static HTML -- but it is written here, not by hand.
+    """
+    path = os.path.join(SITE, "map.html")
+    if not os.path.exists(path):
+        return
+    rows = []
+    for c in sorted(cases, key=lambda c: c.get("date", "")):
+        label, chip, _caveat = CONF.get(c["conf"], CONF["partial"])
+        rows.append(
+            "          <tr><td>%s</td><td><a href=\"case-%s.html\">%s</a></td><td>%s</td><td>%s</td>"
+            "<td>%.2f, \u2212%.2f</td><td><span class=\"chip %s\">%s</span></td></tr>"
+            % (esc(c.get("display") or c["date"]), c["slug"], esc(c["title"]),
+               esc(c.get("prov") or "Canada"), esc(c.get("region") or ""),
+               c["lat"], c["lon"], chip, esc(label)))
+    html = open(path, encoding="utf-8").read()
+    start = html.index('<table id="arc-table-map">')
+    tstart = html.index("<tbody>", start)
+    tend = html.index("</tbody>", tstart)
+    out = html[:tstart + len("<tbody>\n")] + "\n".join(rows) + html[tend:]
+    open(path, "w", encoding="utf-8").write(out)
+
+
 def main():
     cases = json.load(open(os.path.join(DATA, "cases.json"), encoding="utf-8"))
     media = {}
@@ -388,6 +557,13 @@ def main():
     open(os.path.join(SITE, "llms.txt"), "w", encoding="utf-8").write(LLMS)
     open(os.path.join(SITE, "robots.txt"), "w", encoding="utf-8").write(ROBOTS.replace("__BASE__", BASE))
     print("wrote sitemap.xml, robots.txt, llms.txt")
+
+    rewrite_map_table(cases)
+    print("wrote map.html case table (%d rows)" % len(cases))
+
+    assert_prose_counts(cases)
+    assert_lac_prose()
+    sync_faq_structured_data()
 
 
 if __name__ == "__main__":

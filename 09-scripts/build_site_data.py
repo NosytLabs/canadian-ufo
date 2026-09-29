@@ -91,7 +91,6 @@ for pdf in sorted(glob.glob(os.path.join(ROOT, "03-declassified/canufodoc/*.pdf"
         "release": "02",
         "file": "https://documents.theblackvault.com/documents/ufos/canada/" +
                 urllib.parse.quote("Canada - FOIA Part %02d - Pages %d-%d.pdf" % (idx, p1, p2)),
-        "local": "/03-declassified/canufodoc/" + os.path.basename(pdf),
         "thumb": thumb_for(pdf, ident),
     })
 
@@ -110,7 +109,6 @@ for pdf in glob.glob(os.path.join(ROOT, "03-declassified/cirvis/*.pdf")):
         "type": "pdf",
         "release": "03",
         "file": "https://documents2.theblackvault.com/documents/ufos/CIRVIS--Canada-2010-2019.pdf",
-        "local": "/03-declassified/cirvis/" + os.path.basename(pdf),
         "thumb": thumb_for(pdf, ident),
     })
 
@@ -124,7 +122,6 @@ official = [
         "pages": 59, "pageRange": [1, 59],
         "date": "2025-06", "location": "Ottawa, ON", "type": "pdf", "release": "04",
         "file": "https://www.science.gc.ca/site/science/sites/default/files/documents/sky-canada-report.pdf",
-        "local": "/02-official-open-data/ocsa-ufo-report.pdf",
         "thumb": thumb_for(os.path.join(ROOT, "02-official-open-data/ocsa-ufo-report.pdf"), "CAN-UAP-D201"),
     },
     {

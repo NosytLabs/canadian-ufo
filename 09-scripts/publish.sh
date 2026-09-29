@@ -15,7 +15,9 @@ echo "-> generating pages"
 python3 09-scripts/generate_pages.py
 
 echo "-> checking links"
-python3 09-scripts/check_links.py | head -3
+# Do not pipe this: a pipeline reports head's exit status, so a broken link
+# would sail through set -e and still publish.
+python3 09-scripts/check_links.py
 
 echo "-> staging to docs/"
 rm -rf docs

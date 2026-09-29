@@ -3,25 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Case map — Canadian UAP incidents by province and territory — AURORA</title>
-<meta name="description" content="An interactive map of eighteen Canadian UAP case locations across all provinces and territories, from the 1967 Shag Harbour and Falcon Lake incidents to the 2023 NORAD intercept over the Yukon, with colour-coded sourcing quality.">
-<link rel="canonical" href="https://nosytlabs.github.io/canadian-ufo/site/map.html">
+<title>Case map — Canadian UAP incidents by province — AURORA</title>
+<meta name="description" content="An interactive map of eighteen Canadian UAP case locations, from the 1967 Shag Harbour and Falcon Lake incidents to the 2023 NORAD intercept.">
+<link rel="canonical" href="https://nosytlabs.github.io/canadian-ufo/map.html">
 <meta name="theme-color" content="#04060c">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Case map — Canadian UAP incidents — AURORA">
-<meta property="og:description" content="Twelve Canadian UAP cases, mapped and graded by sourcing quality.">
-<meta property="og:url" content="https://nosytlabs.github.io/canadian-ufo/site/map.html">
+<meta property="og:title" content="Case map — Canadian UAP incidents by province — AURORA">
+<meta property="og:description" content="Eighteen Canadian UAP cases, mapped and graded by sourcing quality.">
+<meta property="og:url" content="https://nosytlabs.github.io/canadian-ufo/map.html">
+<meta property="og:image" content="https://nosytlabs.github.io/canadian-ufo/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AURORA — Canada's declassified UAP record, indexed">
+<meta property="og:site_name" content="AURORA">
+<meta property="og:locale" content="en_CA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Case map — Canadian UAP incidents by province and territory — AURORA">
+<meta name="twitter:description" content="An interactive map of eighteen Canadian UAP case locations across all provinces and territories, from the 1967 Shag Harbour and Falcon Lake incidents to the 2023 NORAD intercept over the Yukon, with c">
+<meta name="twitter:image" content="https://nosytlabs.github.io/canadian-ufo/assets/og.png">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="assets/base.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304060c'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%2322d3ee' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%234ade80'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304060c'/%3E%3Ccircle cx='16' cy='16' r='8.5' fill='none' stroke='%235fd4e8' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%235fd4e8'/%3E%3C/svg%3E">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
   "name": "Case map — Canadian UAP incidents by province and territory",
-  "url": "https://nosytlabs.github.io/canadian-ufo/site/map.html",
-  "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/site/" },
-  "description": "Twelve Canadian UAP case locations, colour-coded by sourcing quality: archival or official record, mainstream reporting, or thin sourcing."
+  "url": "https://nosytlabs.github.io/canadian-ufo/map.html",
+  "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" },
+  "description": "Eighteen Canadian UAP case locations, colour-coded by sourcing quality: archival or official record, mainstream reporting, or thin sourcing."
 }
 </script>
 </head>
@@ -63,19 +73,19 @@
   </section>
 
   <section>
-    <div class="map-shell reveal">
+    <div class="map-shell">
       <div id="map" role="application" aria-label="Interactive map of Canadian UAP case locations"></div>
       <div class="map-side">
         <div style="padding:14px 15px;background:var(--glass-strong);border:1px solid var(--line);border-radius:14px;backdrop-filter:blur(14px)">
           <div class="readout-label" style="margin-bottom:9px">Case files · oldest first</div>
-          <ul class="map-list" id="map-list" role="listbox" aria-label="Case list"></ul>
+          <ul class="map-list" id="map-list" role="group" aria-label="Case list"></ul>
         </div>
       </div>
       <div class="map-hint" id="map-note">Canada · Natural Earth boundaries · scroll to zoom · drag to pan</div>
     </div>
 
     <div class="grid g-2" style="margin-top:24px;align-items:start">
-      <div class="card reveal">
+      <div class="card">
         <h3>What the geography shows</h3>
         <ul class="linklist" style="margin-top:14px">
           <li><span class="bullet"></span><div><strong>The Maritimes dominate the famous cases.</strong>
@@ -83,14 +93,14 @@
           <li><span class="bullet"></span><div><strong>Newfoundland and Labrador is the aviation cluster.</strong>
             Gander 1951, Gander 1974 and Stephenville 2013 are all airborne; the last two involved multiple aircraft and were filed as vital-information reports, the kind of record that survives.</div></li>
           <li><span class="bullet"></span><div><strong>The north has the modern intercepts.</strong> The Yukon
-            marker is the 11 February 2023 NORAD downing. not a mystery sighting, but the clearest instance
+            marker is the 11 February 2023 NORAD downing: not a mystery sighting, but the clearest instance
             of a Canadian UAP being tracked, intercepted and recovered.</div></li>
           <li><span class="bullet"></span><div><strong>The Prairies hold the strangest one.</strong> Falcon Lake
             is the only case in this index with a documented physical effect on a person that remains
             unexplained.</div></li>
         </ul>
       </div>
-      <div class="card reveal">
+      <div class="card">
         <h3>How to read the colours</h3>
         <ul id="map-legend" style="list-style:none;margin:14px 0 0;padding:0"></ul>
         <p style="margin-top:16px;font-size:13.4px;color:var(--muted)">
@@ -105,14 +115,14 @@
   </section>
 
   <section>
-    <div class="sec-head reveal">
+    <div class="sec-head">
       <div class="sec-num">01</div>
       <div class="sec-head-col">
         <h2 class="sec-title">The table, for anyone who prefers text</h2>
         <p class="sec-dek">The same eighteen cases, in text. No JavaScript needed.</p>
       </div>
     </div>
-    <div class="table-wrap reveal">
+    <div class="table-wrap">
       <table id="arc-table-map">
         <caption class="sr">Canadian UAP case files with dates, locations and sourcing grades</caption>
         <thead>
@@ -122,25 +132,24 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td>1951-02-10</td><td><a href="case-gander-1951.html">Gander</a></td><td>NL</td><td>Atlantic</td><td>48.95, −54.60</td><td><span class="chip chip-amb">Thin sourcing</span></td></tr>
-          <tr><td>1951-02-10</td><td><a href="case-gander-1951.html">Gander</a></td><td>NL</td><td>Atlantic</td><td>48.95, −54.60</td><td><span class="chip chip-amb">Thin sourcing</span></td></tr>
-          <tr><td>1967-05-20</td><td><a href="case-falcon-lake.html">Falcon Lake</a></td><td>MB</td><td>Prairies / North</td><td>50.10, −96.55</td><td><span class="chip chip-a">Archival or official</span></td></tr>
-          <tr><td>1967-10-04</td><td><a href="case-shag-harbour.html">Shag Harbour</a></td><td>NS</td><td>Atlantic</td><td>43.85, −65.50</td><td><span class="chip chip-a">Archival or official</span></td></tr>
-          <tr><td>1967-10-04</td><td><a href="case-nova-scotia-wave-1967.html">The Night of the UFOs</a></td><td>NS</td><td>Atlantic</td><td>44.37, −64.31</td><td><span class="chip">Mainstream reporting</span></td></tr>
-          <tr><td>1967 (Jun–Nov)</td><td><a href="case-falcon-lake-wave-1967.html">Falcon Lake region wave</a></td><td>MB</td><td>Prairies / North</td><td>50.75, −97.10</td><td><span class="chip">Mainstream reporting</span></td></tr>
-          <tr><td>1974-10-10</td><td><a href="case-gander-1974.html">Gander</a></td><td>NL</td><td>Atlantic</td><td>48.95, −54.60</td><td><span class="chip chip-amb">Thin sourcing</span></td></tr>
-          <tr><td>1978-11-26</td><td><a href="case-clarenville-1978.html">Clarenville</a></td><td>NL</td><td>Atlantic</td><td>48.16, −55.88</td><td><span class="chip chip-amb">Thin sourcing</span></td></tr>
-          <tr><td>2012-06-19</td><td><a href="case-saint-john-2012.html">Saint John</a></td><td>NB</td><td>Atlantic</td><td>45.27, −66.06</td><td><span class="chip">Mainstream reporting</span></td></tr>
-          <tr><td>2013-03-31</td><td><a href="case-stephenville-2013.html">Stephenville</a></td><td>NL</td><td>Atlantic</td><td>48.55, −58.75</td><td><span class="chip chip-a">Archival or official</span></td></tr>
-          <tr><td>2014-06-04</td><td><a href="case-kensington-pei-2014.html">Kensington</a></td><td>PE</td><td>Atlantic</td><td>46.57, −63.57</td><td><span class="chip chip-amb">Thin sourcing</span></td></tr>
-          <tr><td>2014-12-29</td><td><a href="case-moncton-2014.html">Moncton</a></td><td>NB</td><td>Atlantic</td><td>46.09, −64.77</td><td><span class="chip chip-amb">Thin sourcing</span></td></tr>
-          <tr><td>1969-01-01</td><td><a href="case-prince-george-1969.html">Prince George</a></td><td>BC</td><td>West</td><td>53.92, −122.75</td><td><span class="chip chip-amb">Thin sourcing</span></td></tr>
-          <tr><td>1990-11-07</td><td><a href="case-montreal-1990.html">Bonaventure Hotel, Montreal</a></td><td>QC</td><td>Quebec</td><td>45.50, −73.57</td><td><span class="chip">Mainstream reporting</span></td></tr>
-          <tr><td>1996-12-11</td><td><a href="case-yukon-1996.html">The row of lights</a></td><td>YT</td><td>North</td><td>60.72, −135.05</td><td><span class="chip">Mainstream reporting</span></td></tr>
-          <tr><td>2002-02-14</td><td><a href="case-new-brunswick-nuclear-2002.html">NB protected airspace</a></td><td>NB</td><td>Atlantic</td><td>45.85, −66.75</td><td><span class="chip">Mainstream reporting</span></td></tr>
-          <tr><td>2018-11-24</td><td><a href="case-baffin-island-2018.html">Baffin Island</a></td><td>NU</td><td>North</td><td>66.50, −61.25</td><td><span class="chip chip-a">Archival or official</span></td></tr>
-          <tr><td>2023-02-11</td><td><a href="case-yukon-2023.html">Yukon intercept</a></td><td>YT</td><td>North</td><td>63.50, −136.00</td><td><span class="chip chip-a">Archival or official</span></td></tr>
-        </tbody>
+          <tr><td>10 February 1951</td><td><a href="case-gander-1951.html">Gander</a></td><td>NL</td><td>Atlantic</td><td>48.95, −-54.60</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
+          <tr><td>20 May 1967</td><td><a href="case-falcon-lake.html">Falcon Lake</a></td><td>MB</td><td>Prairies / North</td><td>50.10, −-96.55</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
+          <tr><td>June-November 1967</td><td><a href="case-falcon-lake-wave-1967.html">Falcon Lake region, 1967 wave</a></td><td>MB</td><td>Prairies / North</td><td>50.75, −-97.10</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
+          <tr><td>4 October 1967</td><td><a href="case-shag-harbour.html">Shag Harbour</a></td><td>NS</td><td>Atlantic</td><td>43.85, −-65.50</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
+          <tr><td>4 October 1967</td><td><a href="case-nova-scotia-wave-1967.html">The Night of the UFOs</a></td><td>NS</td><td>Atlantic</td><td>44.37, −-64.31</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
+          <tr><td>1 January 1969</td><td><a href="case-prince-george-1969.html">Prince George</a></td><td>BC</td><td>West</td><td>53.92, −-122.75</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
+          <tr><td>10-11 October 1974</td><td><a href="case-gander-1974.html">Gander</a></td><td>NL</td><td>Atlantic</td><td>48.95, −-54.60</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
+          <tr><td>26 October 1978</td><td><a href="case-clarenville-1978.html">Clarenville</a></td><td>NL</td><td>Atlantic</td><td>48.16, −-55.88</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
+          <tr><td>7 November 1990</td><td><a href="case-montreal-1990.html">Bonaventure Hotel, Montreal</a></td><td>QC</td><td>Quebec</td><td>45.50, −-73.57</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
+          <tr><td>11 December 1996</td><td><a href="case-yukon-1996.html">The row of lights</a></td><td>YT</td><td>North</td><td>60.72, −-135.05</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
+          <tr><td>14 February 2002</td><td><a href="case-new-brunswick-nuclear-2002.html">New Brunswick protected airspace</a></td><td>NB</td><td>Atlantic</td><td>45.85, −-66.75</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
+          <tr><td>19 June 2012</td><td><a href="case-saint-john-2012.html">Saint John</a></td><td>NB</td><td>Atlantic</td><td>45.27, −-66.06</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
+          <tr><td>31 March 2013</td><td><a href="case-stephenville-2013.html">Stephenville</a></td><td>NL</td><td>Atlantic</td><td>48.55, −-58.75</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
+          <tr><td>4 June 2014</td><td><a href="case-kensington-pei-2014.html">Kensington</a></td><td>PE</td><td>Atlantic</td><td>46.57, −-63.57</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
+          <tr><td>29 December 2014</td><td><a href="case-moncton-2014.html">Moncton</a></td><td>NB</td><td>Atlantic</td><td>46.09, −-64.77</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
+          <tr><td>24 November 2018</td><td><a href="case-baffin-island-2018.html">Baffin Island</a></td><td>NU</td><td>North</td><td>66.50, −-61.25</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
+          <tr><td>11 February 2023</td><td><a href="case-yukon-2023.html">Yukon shootdown</a></td><td>YT</td><td>North</td><td>63.50, −-136.00</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
+          <tr><td>26 July 2023</td><td><a href="case-fredericton-2023.html">Fredericton</a></td><td>NB</td><td>Atlantic</td><td>45.95, −-66.65</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr></tbody>
       </table>
     </div>
   </section>
@@ -149,14 +158,14 @@
 <footer>
   <div class="foot-inner">
     <div>
-      <h4>Continue</h4>
+      <h2>Continue</h2>
       <ul>
         <li><a href="case.html">Case files →</a></li>
         <li><a href="archive.html">The archival index →</a></li>
       </ul>
     </div>
     <div>
-      <h4>Machine-readable</h4>
+      <h2>Machine-readable</h2>
       <ul>
         <li><a href="data/cases.json">cases.json</a></li>
         <li><a href="data/canada.json">canada.json (Natural Earth, public domain)</a></li>
@@ -164,7 +173,7 @@
       </ul>
     </div>
     <div>
-      <h4>Attribution</h4>
+      <h2>Attribution</h2>
       <ul>
         <li><a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a> (BSD-2)</li>
         <li><a href="https://www.naturalearthdata.com" target="_blank" rel="noopener">Natural Earth</a> (public domain)</li>
@@ -179,9 +188,10 @@
   </div>
 </footer>
 </div>
-<script src="vendor/leaflet/leaflet.js"></script>
-<script src="assets/aurora.js"></script>
-<script src="assets/map.js"></script>
+<script defer src="assets/core.js"></script>
+<script defer src="vendor/leaflet/leaflet.js"></script>
+<script defer src="assets/aurora.js"></script>
+<script defer src="assets/map.js"></script>
 <script>
   // honour a deep link like map.html#shag-harbour once the map is ready
   window.addEventListener("load", function () {

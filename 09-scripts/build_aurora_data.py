@@ -522,7 +522,7 @@ TIMELINE = [
     ("2025-06", "Sky Canada Project", "The Office of the Chief Science Advisor publishes Management of Public Reporting of Unidentified Aerial Phenomena in Canada - 59 pages, 14 recommendations, and a recommendation that a federal department be named to hold the file."),
     ("2026", "The question goes unanswered", "Written Question 3227, on the Yukon intercept, sat unanswered until the 44th Parliament dissolved. The Library of Parliament now marks it as historical information the government is no longer required to answer."),
     ("2026-07", "Sixty years, still a visitor centre", "The Shag Harbour UFO Incident Society keeps the interpretive centre on Highway 3 open, and the case still draws an annual gathering. The first caller, Laurie Wickens, died in 2026 at 76."),
-    ("2026", "The United States releases, Canada does not", "The US Department of War releases declassified UAP records in tranches under PURSUE, starting 8 May 2026. No Canadian equivalent has followed, and the Sky Canada Project's first recommendation - name a department to hold the file - is still unimplemented."),
+    ("2026", "The United States releases, Canada does not", "The US Department of War releases declassified UAP records in tranches under PURSUE, starting 8 May 2026; the sixth tranche followed on 18 September 2026. No Canadian equivalent has followed, and the Sky Canada Project's first recommendation - name a department to hold the file - is still unimplemented.", True),
 ]
 
 # ------------------------------------------------------------------ 4. media
@@ -599,6 +599,9 @@ ENDPOINTS = [
     {"name": "Sky Canada Project - report page", "org": "Office of the Chief Science Advisor",
      "url": "https://science.gc.ca/site/science/en/office-chief-science-advisor/sky-canada-project",
      "note": "Landing page for the June 2025 federal report on UAP reporting in Canada."},
+    {"name": "Sky Canada Project - report in full text (HTML)", "org": "Office of the Chief Science Advisor",
+     "url": "https://science.gc.ca/site/science/en/office-chief-science-advisor/sky-canada-project/management-public-reporting-unidentified-aerial-phenomena-canada",
+     "note": "The whole report as HTML, including all fourteen recommendations, the five named gaps and the CSA's message. The easiest of the three to cite from."},
     {"name": "Sky Canada Project - full report (59 pp, PDF)", "org": "Office of the Chief Science Advisor",
      "url": "https://www.science.gc.ca/site/science/sites/default/files/documents/sky-canada-report.pdf",
      "note": "ISBN 978-0-660-78645-2. Fourteen recommendations, the history of federal reporting, and the 2023-2024 consultation."},
@@ -659,7 +662,11 @@ SURVEY = [
 if __name__ == "__main__":
     build_geometry()
     w("cases.json", CASES)
-    w("timeline.json", [{"year": y, "title": ti, "body": b} for y, ti, b in TIMELINE])
+    # The fourth tuple element marks the single live entry; the renderer used
+    # to infer it from the year, which lit up every 2026 row at once.
+    w("timeline.json", [({"year": y, "title": ti, "body": b} if len(row) == 3
+                         else {"year": y, "title": ti, "body": b, "now": True})
+                        for row in TIMELINE for y, ti, b in [row[:3]]])
     w("media.json", MEDIA)
     w("podcasts.json", PODCASTS)
     w("endpoints.json", ENDPOINTS)

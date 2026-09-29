@@ -11,22 +11,13 @@
   ];
 
   var CONF = {
-    primary:  { label: "Archival or official record", color: "#22d3ee", r: 8 },
-    reported: { label: "Mainstream reporting, named sources", color: "#4ade80", r: 7 },
+    primary:  { label: "Archival or official record", color: "#5fd4e8", r: 8 },
+    reported: { label: "Mainstream reporting, named sources", color: "#7f9cf5", r: 7 },
     partial:  { label: "Thin sourcing — verify before citing", color: "#f59e0b", r: 6 }
   };
 
-  function ready(fn) {
-    if (document.readyState !== "loading") fn();
-    else document.addEventListener("DOMContentLoaded", fn);
-  }
-
-  function fetchJSON(url) {
-    return fetch(url).then(function (r) {
-      if (!r.ok) throw new Error(url + " → " + r.status);
-      return r.json();
-    });
-  }
+  var A = window.Aurora;
+  var ready = A.ready, fetchJSON = A.fetchJSON, esc = A.esc, findBy = A.findBy;
 
   ready(function () {
     var el = document.getElementById("map");
@@ -86,7 +77,6 @@
           }).addTo(map);
         }
 
-        window.__auroraMap = map;
         var markers = [];
         cases.forEach(function (c) {
           var cfg = CONF[c.conf] || CONF.partial;
@@ -96,13 +86,18 @@
           }).addTo(map);
           m.caseSlug = c.slug;
           m.conf = c.conf;
-          var html = '<h4>' + c.title + (c.prov ? ", " + c.prov : "") + '</h4>' +
-            '<p class="pp">' + c.display + " &middot; " + (c.region || "") + "</p>" +
-            "<p>" + c.summary + "</p>" +
+          var html = '<h4>' + esc(c.title) + (c.prov ? ", " + esc(c.prov) : "") + '</h4>' +
+            '<p class="pp">' + esc(c.display) + " &middot; " + esc(c.region) + "</p>" +
+            "<p>" + esc(c.summary) + "</p>" +
             '<p class="pp" style="margin:0"><span style="color:' + cfg.color + '">' + cfg.label + "</span></p>";
           m.bindPopup(html, { maxWidth: 320 });
           m.on("click", function () { go(c.slug); });
-          m.on("keypress", function () { go(c.slug); });
+          m.on("keydown", function (e) {
+            if (e.originalEvent && (e.originalEvent.key === "Enter" || e.originalEvent.key === " ")) {
+              e.originalEvent.preventDefault();
+              go(c.slug);
+            }
+          });
           markers.push(m);
         });
 
@@ -114,10 +109,10 @@
               var li = document.createElement("li");
               var b = document.createElement("button");
               b.type = "button";
-              b.setAttribute("aria-selected", "false");
+              b.setAttribute("aria-current", "false");
               b.dataset.slug = c.slug;
-              b.innerHTML = '<span class="yr">' + c.date.slice(0, 4) + '</span><span>' +
-                c.title + (c.prov ? " <span style='color:var(--faint)'>" + c.prov + "</span>" : "") + "</span>";
+              b.innerHTML = '<span class="yr">' + esc(c.date.slice(0, 4)) + '</span><span>' +
+                esc(c.title) + (c.prov ? " <span style='color:var(--faint)'>" + esc(c.prov) + "</span>" : "") + "</span>";
               b.addEventListener("click", function () { go(c.slug); });
               li.appendChild(b);
               list.appendChild(li);
@@ -137,12 +132,12 @@
           if (!c) return;
           if (!fromList) {
             map.setView([c.lat, c.lon], Math.max(map.getZoom(), 5), { animate: true });
-            var b = list && list.querySelector('button[data-slug="' + slug + '"]');
+            var b = list && findBy(list, "slug", slug);
             if (b && b.scrollIntoView) b.scrollIntoView({ block: "nearest" });
           }
           if (list) {
             list.querySelectorAll("button").forEach(function (x) {
-              x.setAttribute("aria-selected", String(x.dataset.slug === slug));
+              x.setAttribute("aria-current", String(x.dataset.slug === slug));
             });
           }
           var target = markers.filter(function (m) { return m.caseSlug === slug; })[0];
@@ -151,14 +146,27 @@
           if (history.replaceState) {
             history.replaceState(null, "", "#" + slug);
           }
-          var card = document.querySelector('[data-case-card="' + slug + '"]');
+          var card = findBy(document, "caseCard", slug);
           if (card && !fromList) {
             card.scrollIntoView({ block: "center", behavior: "smooth" });
             card.classList.add("is-open");
           }
-          var jump = document.getElementById("open-" + slug);
-          if (jump) jump.click();
+          // No-op on index.html and map.html: the open-* cards are only on
+          // case.html, which does not load this file. Kept because a future
+          // inline map on the case page would want it.
         }
+
+        /* Deep link. Every case page's "view on map" chip links to
+           map.html#<slug>; without this the fragment was ignored and the map
+           loaded with no case selected. */
+        function fromHash() {
+          var slug = decodeURIComponent((location.hash || "").slice(1));
+          if (!slug) return;
+          if (!cases.some(function (c) { return c.slug === slug; })) return;
+          select(slug, false);
+        }
+        window.addEventListener("hashchange", fromHash);
+        fromHash();
 
         // fitBounds last, and never call setMaxBounds afterwards: it re-fits the
         // view to the padded bounds and zooms the whole of Canada out of frame.
@@ -167,7 +175,7 @@
         var bounds = provinces.getBounds();
         function fit() {
           map.invalidateSize();
-          if (window.matchMedia("(min-width: 761px)").matches) {
+          if (!A.narrow()) {
             map.fitBounds(bounds, { padding: [18, 18], maxZoom: 5 });
           } else {
             map.setView(bounds.getCenter(), 3);
@@ -175,9 +183,13 @@
         }
         // A frame callback is not guaranteed to run (headless capture, virtual
         // clocks, some embedded webviews), so drive the fit from a timer too.
+        var fitTimer = null;
         requestAnimationFrame(function () { requestAnimationFrame(fit); });
         setTimeout(fit, 250);
-        window.addEventListener("resize", function () { clearTimeout(window.__auroraFitT); window.__auroraFitT = setTimeout(fit, 180); });
+        window.addEventListener("resize", function () {
+          clearTimeout(fitTimer);
+          fitTimer = setTimeout(fit, 180);
+        });
         // no setMaxBounds here: it re-fits the view to the padded bounds and
         // zooms Canada out of frame. The generous maxBounds in the map options
         // is enough to keep the user from panning into the Pacific.

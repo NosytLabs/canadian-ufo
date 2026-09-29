@@ -45,7 +45,7 @@ the live open-data endpoints that serve the record today.
 
 - /data/releases.json : 40 release records
 - /data/lac.json : 1,510 archival descriptions with source URLs
-- /data/cases.json : 12 case files with coordinates and source links
+- /data/cases.json : 18 case files with coordinates and source links
 - /data/timeline.json, /data/media.json, /data/podcasts.json, /data/endpoints.json, /data/survey.json
 - /data/canada.json : Natural Earth province boundaries (public domain)
 
