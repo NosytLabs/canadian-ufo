@@ -447,6 +447,9 @@ footer { border-top: 1px solid var(--line); padding: 46px clamp(16px, 4vw, 40px)
 .noscript-note b { color: #ffe9c2; }
 .noscript-note a { color: #ffd894; }
 .spinner { padding: 40px; text-align: center; font: 400 13px var(--mono); color: var(--faint); }
+/* Without JS these are never replaced, and they read as a page stuck loading
+   right above the note that says so. core.js sets .js when it runs. */
+html:not(.js) .spinner { display: none; }
 .error-note { padding: 18px 20px; border-radius: var(--r-sm); border: 1px solid rgba(225,29,72,.3); background: var(--red-soft); color: #ffc4d0; font-size: 13.4px; }
 
 /* Basemap: OpenStreetMap tiles inverted into the dark theme. Vector overlays
