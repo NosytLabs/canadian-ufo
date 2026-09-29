@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open data and how to get the records yourself — AURORA</title>
+<meta name="description" content="Working Canadian government endpoints for UAP research: the open.canada.ca CKAN API queried live from this page, the Library and Archives Canada UFO database, the Sky Canada Project report, parliamentary written questions, and how to file an access-to-information request.">
+<link rel="canonical" href="https://nosytlabs.github.io/canadian-ufo/data.html">
+<meta name="theme-color" content="#04060c">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Open data and how to get the records yourself — AURORA">
+<meta property="og:description" content="Live Canadian government API endpoints for UAP research, plus how to request records directly.">
+<meta property="og:url" content="https://nosytlabs.github.io/canadian-ufo/data.html">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304060c'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%2322d3ee' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%234ade80'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Open data and how to get the records yourself",
+  "url": "https://nosytlabs.github.io/canadian-ufo/data.html",
+  "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" },
+  "description": "Verified Canadian government API endpoints and access-to-information routes for UAP records."
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="aurora-field" aria-hidden="true"></div>
+<div class="shell">
+
+<header class="site-head">
+  <a class="brand" href="index.html">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span><span class="brand-name">AURORA</span><span class="brand-sub">Canada's UAP record</span></span>
+  </a>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Menu">☰</button>
+  <nav class="nav" id="nav" aria-label="Primary">
+    <a href="index.html">Overview</a>
+    <a href="releases.html">Releases</a>
+    <a href="archive.html">Archive index</a>
+    <a href="case.html">Case files</a>
+    <a href="map.html">Map</a>
+    <a href="media.html">Media</a>
+    <a href="data.html" aria-current="page">Open data</a>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="hero" style="padding-bottom:8px">
+    <div class="hero-inner" style="grid-template-columns:1fr">
+      <div>
+        <p class="kicker">Open data · live endpoints · access to information</p>
+        <h1 style="font-size:clamp(36px,6vw,70px)">Get the records yourself</h1>
+        <p class="hero-lede" style="max-width:76ch">
+          Everything AURORA shows is reachable from a public endpoint or a public reading room. The
+          endpoints below were checked before they were listed. Some of them will return nothing — that is a
+          result, not a failure, and the Sky Canada report's first recommendation exists precisely because
+          Canada never built a dataset.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head reveal">
+      <div class="sec-num">01</div>
+      <div class="sec-head-col">
+        <h2 class="sec-title">Query the federal open catalogue, live</h2>
+        <p class="sec-dek">This runs in your browser against open.canada.ca's CKAN API. Try <code>UFO</code>,
+          <code>UAP</code>, <code>CADORS</code>, or anything else.</p>
+      </div>
+    </div>
+    <div class="card reveal">
+      <form id="ckan-form" class="filters" style="margin-bottom:18px">
+        <label class="search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="ckan-q" type="search" value="UFO" aria-label="Search term for the open data catalogue">
+        </label>
+        <button class="btn btn-primary" type="submit">Search open.canada.ca</button>
+      </form>
+      <div id="ckan-out"><p class="spinner">Querying…</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head reveal">
+      <div class="sec-num">02</div>
+      <div class="sec-head-col">
+        <h2 class="sec-title">Verified endpoints</h2>
+        <p class="sec-dek">The working list. Every one of these returned a 200 when this page was built.</p>
+      </div>
+    </div>
+    <ul class="linklist reveal" id="ep-list"><li><p class="spinner">Loading endpoints…</p></li></ul>
+  </section>
+
+  <section>
+    <div class="sec-head reveal">
+      <div class="sec-num">03</div>
+      <div class="sec-head-col">
+        <h2 class="sec-title">The fourteen recommendations, in their own words</h2>
+        <p class="sec-dek">From the Report of the Sky Canada Project, June 2025. This is the federal
+          government's own list of what is missing.</p>
+      </div>
+    </div>
+    <div class="grid g-2">
+      <div class="card reveal">
+        <h3>Reporting and data oversight</h3>
+        <ol class="prose" style="margin-top:12px;padding-left:20px;font-size:14px">
+          <li>Identify a lead: a federal department or agency responsible for managing public UAP data.</li>
+          <li>Establish a dedicated service that collects testimonies, investigates cases and posts its
+            analyses publicly.</li>
+          <li>Enhance reporting capacity in civil aviation — Transport Canada should encourage pilots, cabin
+            crews and controllers to report without fear of stigmatization, and analyse reports with NAV CANADA.</li>
+        </ol>
+      </div>
+      <div class="card reveal">
+        <h3>Communications</h3>
+        <ol class="prose" style="margin-top:12px;padding-left:20px;font-size:14px;counter-reset:none">
+          <li value="4">Support public dialogue on UAPs through a proactive transparency strategy.</li>
+          <li value="5">Promote intra-government collaboration through an internal directive.</li>
+          <li value="6">Improve media relations, including documenting common misinterpretations.</li>
+          <li value="7">Set up a multidisciplinary expert panel to advise on countering misinformation.</li>
+        </ol>
+      </div>
+      <div class="card reveal">
+        <h3>Research</h3>
+        <ol class="prose" style="margin-top:12px;padding-left:20px;font-size:14px">
+          <li value="8">Facilitate open access and open data on UAPs.</li>
+          <li value="9">Conduct periodic surveys of Canadian perceptions.</li>
+          <li value="10">Support citizen science and participatory science initiatives.</li>
+          <li value="11">Provide publicly accessible, portable tools for standardized sighting reports.</li>
+          <li value="12">Build on Canada's astronomy and aerospace research community in the public dialogue.</li>
+        </ol>
+      </div>
+      <div class="card reveal">
+        <h3>International collaboration</h3>
+        <ol class="prose" style="margin-top:12px;padding-left:20px;font-size:14px">
+          <li value="13">Establish partnerships with AARO and NASA in the United States, GEIPAN in France,
+            and SEFAA in Chile.</li>
+          <li value="14">Cooperate with international partners on research and public awareness.</li>
+        </ol>
+        <p style="margin-top:14px"><a class="btn" href="https://www.science.gc.ca/site/science/sites/default/files/documents/sky-canada-report.pdf" target="_blank" rel="noopener">Read the full report</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head reveal">
+      <div class="sec-num">04</div>
+      <div class="sec-head-col">
+        <h2 class="sec-title">Requesting the records nobody has released</h2>
+        <p class="sec-dek">What the Sky Canada report did not resolve is still available under access to
+          information — it is just slow, and the two best targets are known.</p>
+      </div>
+    </div>
+    <div class="grid g-2">
+      <article class="card reveal">
+        <h3>Target 1 — the Shag Harbour memo</h3>
+        <p>The October 1967 memo that discounted aircraft, flares, floats and other known objects is signed by
+          initials only, and the initials themselves are inconsistent between transcriptions: one reads
+          Col. W. W. Turner, another reads Col. T. T. Turner. The file is identified as RG 24, accession
+          83-84-167, box 7523, file DRBS 3800-10-1 pt 1. That is exactly the kind of small, specific request
+          that a diligent ATIP officer can actually fill.</p>
+        <div class="chips meta"><span class="chip chip-a">RG 24</span><span class="chip">acc. 83-84-167</span><span class="chip">box 7523</span></div>
+      </article>
+      <article class="card reveal">
+        <h3>Target 2 — Atlantic MERINT and provincial files</h3>
+        <p>No list of Atlantic merchant-vessel MERINT incidents has been published. The Canadian Coast Guard
+          ran the instruction; the reports went to its Western region. Separately, the Provincial Archives of
+          New Brunswick hold the papers of Stanton Friedman, and whether those include sighting reports is an
+          open question worth a letter.</p>
+        <div class="chips meta"><span class="chip">Coast Guard MERINT</span><span class="chip">PANB</span></div>
+      </article>
+      <article class="card reveal">
+        <h3>How to actually file</h3>
+        <p>Write to the institution that holds the file, name the record group and box numbers if you have
+          them, describe the records and the date range, and ask for electronic copies. Access to information
+          in Canada is about thirty days plus a possible extension, and fees apply only above a de minimis
+          threshold. Be specific — a vague request about UFOs gets a vague refusal.</p>
+        <div class="meta"><a class="btn" href="https://www.canada.ca/en/department-national-defence.html" target="_blank" rel="noopener">Access to information at DND</a></div>
+      </article>
+      <article class="card reveal">
+        <h3>Target 3 — the modern reporting channel</h3>
+        <p>There is no Canadian equivalent of the US all-domain anomaly office. Until the first Sky Canada
+          recommendation is implemented, the only federal intake for a pilot or crew sighting is Transport
+          Canada's CADORS occurrence report — and no analysis of what lands there has been published.</p>
+        <div class="chips meta"><span class="chip">CADORS</span><span class="chip">no lead agency</span></div>
+        <div class="meta"><a class="btn" href="https://tc.canada.ca/en/aviation/aviation-accidents-investigations/emergencies-incident-reporting" target="_blank" rel="noopener">Transport Canada — report an occurrence</a></div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head reveal">
+      <div class="sec-num">05</div>
+      <div class="sec-head-col">
+        <h2 class="sec-title">Everything here, machine-readable</h2>
+        <p class="sec-dek">If you are building something, start with these. They are small, stable, and
+          documented enough to be worth citing.</p>
+      </div>
+    </div>
+    <ul class="linklist reveal">
+      <li><span class="bullet"></span><div><a href="data/releases.json">data/releases.json</a>
+        <div class="desc">40 release records: id, title, source agency, page count, date, type, and the direct
+          file or source URL.</div></div></li>
+      <li><span class="bullet"></span><div><a href="data/lac.json">data/lac.json</a>
+        <div class="desc">207 archival descriptions with record numbers, record groups, dates, locations, and
+          deep links into the live LAC record.</div></div></li>
+      <li><span class="bullet"></span><div><a href="data/cases.json">data/cases.json</a>
+        <div class="desc">12 case files with coordinates, a sourcing grade, narrative detail, source links and
+          linked media ids.</div></div></li>
+      <li><span class="bullet"></span><div><a href="data/timeline.json">data/timeline.json</a>
+        <div class="desc">80 years of the Canadian record, one entry per event.</div></div></li>
+      <li><span class="bullet"></span><div><a href="data/media.json">data/media.json</a> and <a href="data/podcasts.json">data/podcasts.json</a>
+        <div class="desc">Verified embed URLs, publishers and dates, with each item linked to the case it
+          documents.</div></div></li>
+      <li><span class="bullet"></span><div><a href="data/endpoints.json">data/endpoints.json</a>
+        <div class="desc">The verified endpoint list, as data rather than prose.</div></div></li>
+      <li><span class="bullet"></span><div><a href="data/canada.json">data/canada.json</a>
+        <div class="desc">Province and territory boundaries from Natural Earth (public domain), simplified for
+          the web. Use it to plot your own records.</div></div></li>
+      <li><span class="bullet"></span><div><a href="llms.txt">llms.txt</a>
+        <div class="desc">A plain-text summary of the archive, its key facts and every page — written for
+          language models and answer engines.</div></div></li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <div>
+      <h4>Continue</h4>
+      <ul>
+        <li><a href="archive.html">The archival index →</a></li>
+        <li><a href="case.html">Case files →</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Machine-readable</h4>
+      <ul>
+        <li><a href="data/endpoints.json">endpoints.json</a></li>
+        <li><a href="sitemap.xml">sitemap.xml</a></li>
+        <li><a href="robots.txt">robots.txt</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Source of the recommendations</h4>
+      <ul>
+        <li><a href="https://publications.gc.ca/site/eng/9.954480/publication.html" target="_blank" rel="noopener">Publications Canada</a></li>
+        <li><a href="https://science.gc.ca/site/science/en/office-chief-science-advisor/sky-canada-project" target="_blank" rel="noopener">Sky Canada Project</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="disclaimer">
+    <b>Not a government website.</b> AURORA is an independent research project, not affiliated with the
+    Government of Canada. Endpoints are third-party government services; AURORA is not responsible for
+    their availability. "Unidentified" is a finding, not a conclusion.
+  </div>
+</footer>
+</div>
+<script src="assets/aurora.js"></script>
+</body>
+</html>
