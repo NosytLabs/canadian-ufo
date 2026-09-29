@@ -27,6 +27,8 @@ __pycache__/
 .idea/
 .vscode/
 
+# docs/ is generated from site/ by 09-scripts/publish.sh and IS committed
+
 # Capture artefacts
 screenshots/
 *.png.tmp

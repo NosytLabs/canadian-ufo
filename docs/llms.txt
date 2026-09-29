@@ -1,0 +1,52 @@
+# AURORA — Canada's UAP record
+
+> An independent, non-governmental index of Canada's federal unidentified aerial phenomena (UAP) file.
+> Not affiliated with the Government of Canada. Nothing here is evidence of extraterrestrial activity.
+
+AURORA indexes Canadian government records on unidentified flying objects: declassified federal releases,
+archival descriptions from Library and Archives Canada, graded case files with primary-source links, and
+the live open-data endpoints that serve the record today.
+
+## Key facts (with sources)
+
+- Canada collected UFO reports for roughly four decades. About 9,500 digitized documents from four federal
+  departments (National Defence, Transport, National Research Council, RCMP) span 1947 to the early 1980s.
+  Source: https://www.canada.ca/en/library-archives/collection/research-help/science-technology/ufos.html
+- Project Magnet began in 1950, when the Department of Transport let engineer Wilbert Smith research whether
+  UFOs could use Earth's magnetic field for propulsion; it was terminated in 1954.
+- Project Second Storey was formed in 1952 by the Defence Research Board, chaired by NRC astronomer
+  Dr. Peter Millman. Source: Sky Canada Project report, June 2025.
+- The National Research Council ran the file from 1967 into the 1990s, after the Minister of National Defence
+  transferred responsibility to it.
+- The June 2025 Report of the Sky Canada Project (Office of the Chief Science Advisor) makes 14
+  recommendations, the first being to name a federal department to hold public UAP data.
+  Source: https://www.science.gc.ca/site/science/sites/default/files/documents/sky-canada-report.pdf
+- Canada has no equivalent of the US Department of War's PURSUE releases (begun 2026).
+
+## Pages
+
+- / : overview, map, release index, case grid, timeline, FAQ
+- /releases.html : 40 records in five tranches, searchable
+- /archive.html : 207 archival descriptions, searchable and sortable
+- /case.html : all case files, graded by sourcing quality
+- /map.html : eighteen case locations on an interactive Canada map
+- /media.html : verified Canadian documentary and news video
+- /data.html : open-government endpoints, live CKAN queries, how to request records
+- /case-<slug>.html : one stable, citable page per case (Shag Harbour, Falcon Lake, Gander 1951,
+  Gander 1974, Stephenville, the Night of the UFOs, Saint John, Fredericton, Moncton, Clarenville,
+  Kensington, Baffin Island, Prince George, Montreal, the Yukon row of lights, the New Brunswick
+  protected-airspace report, the Yukon intercept, and the Falcon Lake region wave)
+
+## Data
+
+- /data/releases.json : 40 release records
+- /data/lac.json : 207 archival descriptions with source URLs
+- /data/cases.json : 12 case files with coordinates and source links
+- /data/timeline.json, /data/media.json, /data/podcasts.json, /data/endpoints.json, /data/survey.json
+- /data/canada.json : Natural Earth province boundaries (public domain)
+
+## Conventions
+
+"UAP" means unidentified aerial phenomenon; "UFO" means unidentified flying object. Case files are graded:
+archival or official record / mainstream reporting with named sources / thin sourcing. Gaps are marked
+rather than filled.

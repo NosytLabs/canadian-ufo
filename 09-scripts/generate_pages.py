@@ -352,7 +352,7 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://aurora-uap.example/sitemap.xml
+Sitemap: __BASE__/sitemap.xml
 """
 
 
@@ -382,7 +382,7 @@ def main():
     open(os.path.join(SITE, "sitemap.xml"), "w", encoding="utf-8").write("\n".join(sm))
 
     open(os.path.join(SITE, "llms.txt"), "w", encoding="utf-8").write(LLMS)
-    open(os.path.join(SITE, "robots.txt"), "w", encoding="utf-8").write(ROBOTS)
+    open(os.path.join(SITE, "robots.txt"), "w", encoding="utf-8").write(ROBOTS.replace("__BASE__", BASE))
     print("wrote sitemap.xml, robots.txt, llms.txt")
 
 

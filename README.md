@@ -13,7 +13,8 @@ activity — "unidentified" is the finding, not a conclusion.
 
 | Path | What it holds |
 |---|---|
-| `site/` | The website. Static HTML, no build step, no framework. |
+| `site/` | The authored website. Static HTML, no build step, no framework. |
+| `docs/` | Generated copy of `site/` for GitHub Pages. Do not edit by hand. |
 | `site/data/` | Generated JSON: case files, release index, archival descriptions, media, endpoints, map geometry. |
 | `site/vendor/leaflet/` | Vendored Leaflet 1.9.4 (BSD-2), so the map works without a CDN. |
 | `03-declassified/` | The 29-volume Canada FOIA series (8,759 pages) and the 2010–2019 CIRVIS compilation. ~1 GB, not in git. |
@@ -35,11 +36,25 @@ python3 -m http.server 8811
 ## Rebuilding
 
 ```sh
+sh 09-scripts/publish.sh                 # rebuild everything and stage docs/ for Pages
+```
+
+or step by step:
+
+```sh
 python3 09-scripts/build_site_data.py    # release index + LAC index -> site/data
 python3 09-scripts/build_aurora_data.py  # cases, timeline, media, endpoints, geometry
 python3 09-scripts/generate_pages.py     # one page per case + sitemap/robots/llms.txt
 python3 09-scripts/check_links.py        # every internal and external link
 ```
+
+## Publishing
+
+GitHub Pages only serves from `/` or `/docs`, and the 1 GB source archive must stay
+out of the repository, so `site/` is copied to `docs/` by `09-scripts/publish.sh`
+and Pages is pointed at `/docs`. The site is published at
+<https://nosytlabs.github.io/canadian-ufo/>. Document cards open the public
+mirrors rather than the local archive, so the deployed site works standalone.
 
 `build_aurora_data.py` needs `natural-earth-vector` on first run; it caches the
 download in `/tmp`. Document thumbnails come from macOS `qlmanage` and are cached
