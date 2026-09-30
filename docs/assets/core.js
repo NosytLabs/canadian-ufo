@@ -43,27 +43,37 @@ window.Aurora = (function () {
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
-  /* Match on a data attribute without interpolating the value into a selector
-   * string, where a quote in the value would break out of it. */
-  function findBy(root, attr, val) {
-    var sel = root.querySelectorAll("[data-" + attr + "]");
-    for (var i = 0; i < sel.length; i++) if (sel[i].dataset[attr] === val) return sel[i];
-    return null;
-  }
-
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $$(sel, root) {
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
   }
 
-  /* base.css switches the hero to one column and the nav to a drawer at
-   * max-width 940px and 760px. These used to be hardcoded as innerWidth
-   * literals in JS at 900 and 760, so between 761-940px the FAQ collapsed
-   * while the layout was still two columns. Ask the stylesheet instead. */
-  var NARROW = "(max-width: 760px)", WIDE = "(min-width: 761px)", SINGLE = "(max-width: 940px)";
+  /* base.css switches the nav to a drawer at max-width 760px. This used to be
+   * hardcoded as an innerWidth literal in JS at 900, so between 761-900px the
+   * FAQ collapsed while the layout was still two columns -- hence asking the
+   * stylesheet. There is a second breakpoint at 940px for the hero; it is not
+   * used from JS and is not encoded here. */
+  var NARROW = "(max-width: 760px)";
   function narrow() { return window.matchMedia(NARROW).matches; }
-  function singleColumn() { return window.matchMedia(SINGLE).matches; }
 
-  return { ready: ready, fetchJSON: fetchJSON, esc: esc, findBy: findBy,
-           $: $, $$: $$, narrow: narrow, singleColumn: singleColumn };
+  /* The sourcing-confidence scale.
+   *
+   * It used to be defined three times -- here, in map.js, and in aurora.js --
+   * and generate_pages.py had a fourth copy for the case-page chips. The copies
+   * had already drifted: one said "Mainstream reporting, named sources" and
+   * another "Mainstream reporting WITH named sources", both of which ship.
+   * map.html's hero once called the wrong colour "mainstream reporting" too.
+   *
+   * The build now reads the labels below out of this file rather than keeping a
+   * fifth copy, so there are two: this, and the colours in base.css as .conf-*.
+   * Nothing here sets a colour. */
+  var CONF = {
+    primary:  { label: "Archival or official record", short: "Archival or official", chip: "chip-a" },
+    reported: { label: "Mainstream reporting, named sources", short: "Mainstream reporting", chip: "chip" },
+    partial:  { label: "Thin sourcing \u2014 verify before citing", short: "Thin sourcing", chip: "chip-amb" }
+  };
+  function conf(key) { return CONF[key] || CONF.partial; }
+
+  return { ready: ready, fetchJSON: fetchJSON, esc: esc,
+           $: $, $$: $$, narrow: narrow, CONF: CONF, conf: conf };
 })();

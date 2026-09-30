@@ -4,7 +4,7 @@
 Sources are recorded inline so every card on the site can be traced back.
 Run from anywhere:  python3 09-scripts/build_aurora_data.py
 """
-import json, os, re, subprocess, urllib.request, urllib.error, ssl
+import io, json, os, re, struct, subprocess, sys, time, urllib.request, urllib.error, ssl
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, "site")
@@ -30,71 +30,227 @@ def w(name, obj):
     print("wrote %-20s %8d bytes" % (name, os.path.getsize(p)))
 
 
-def get(url, timeout=45):
-    try:
-        req = urllib.request.Request(url, headers=UA)
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return r.read()
-    except Exception as e:
-        print("  fetch failed", url, e)
-        return b""
+def get(url, timeout=45, tries=3):
+    """Fetch bytes, retrying transport failures.
+
+    This had no retry, unlike every scraper in 09-scripts. One flaky response
+    took the whole build down with an empty map geometry, and because the empty
+    result was cached before anything looked at it, the next run failed too --
+    on a BadZipFile from a file that was never going to be a zip.
+    """
+    for attempt in range(tries):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except Exception as e:
+            if attempt == tries - 1:
+                print("  fetch failed after %d attempts" % tries, url, e, file=sys.stderr)
+                return b""
+            time.sleep(2 * (attempt + 1))
+    return b""
 
 
 # ----------------------------------------------------------------- 1. geometry
-# Natural Earth 50m admin-1, filtered to Canada, coordinates rounded for a
-# ~200 KB payload. Source: public domain (naturalearthdata.com).
+# Provincial and territorial boundaries come from Natural Resources Canada's
+# CanVec (Canadian cartographic reference product, 15 m Administrative theme),
+# published on the Open Government Portal under the Open Government Licence -
+# Canada. It is the authoritative source, drawn by the government that owns the
+# borders.
+#
+# This replaced Natural Earth 50m admin-1, which was a US dataset: it mis-drew
+# the Canadian Arctic, omitted the High Arctic islands, and made the site's own
+# map disagree with the country it is about.
+#
+# The shapefile is read here with a small stdlib reader rather than a GIS
+# dependency, so building the site stays `python3 script.py` with nothing to
+# install. Verified against the same layer with pyshp; the two agree.
+CANVEC_URL = ("https://ftp.maps.canada.ca/pub/nrcan_rncan/vector/canvec/shp/Admin/"
+              "canvec_15M_CA_Admin_shp.zip")
+CANVEC_LAYER = "geo_political_region_2"
+CANVEC_CACHE = os.path.join(ROOT, "09-scripts", ".cache")
+CANVEC_LICENCE = ("Natural Resources Canada, CanVec 15M Administrative Features "
+                  "(Open Government Licence - Canada)")
+# The short form the map credits the boundaries with. It lives here because
+# map.js reads it out of canada.json and writes it into the credit line, rather
+# than the string being typed by hand into index.html and map.html separately --
+# which is how a map ended up credited to CARTO in one place and OpenFreeMap in
+# the line right above it.
+CANVEC_CREDIT = "Natural Resources Canada CanVec"
+# The basemap is tiles.openfreemap.org's keyless dark style, which serves
+# OpenStreetMap data. Both names belong in the credit: the tiles are served by
+# one and the data is the other's.
+OPENFREEMAP_CREDIT = "OpenFreeMap (OpenStreetMap)"
+
+# CanVec's `juri` codes, which are the StatCan standard geographical
+# classification numbers offset by 90. Taken from the data rather than assumed,
+# so the abbreviations come from the same numbering the boundaries are drawn on.
+JURISDICTIONS = {
+    "92": ("Alberta", "AB", "Province"),
+    "93": ("British Columbia", "BC", "Province"),
+    "94": ("Manitoba", "MB", "Province"),
+    "95": ("New Brunswick", "NB", "Province"),
+    "96": ("Newfoundland and Labrador", "NL", "Province"),
+    "97": ("Nova Scotia", "NS", "Province"),
+    "100": ("Ontario", "ON", "Province"),
+    "101": ("Prince Edward Island", "PE", "Province"),
+    "102": ("Quebec", "QC", "Province"),
+    "103": ("Saskatchewan", "SK", "Province"),
+    "104": ("Yukon", "YT", "Territory"),
+    "98": ("Northwest Territories", "NT", "Territory"),
+    "99": ("Nunavut", "NU", "Territory"),
+}
+
+
+def _canvec_shapes():
+    """Download and unzip the CanVec Admin theme; return the extracted dir."""
+    import zipfile
+    os.makedirs(CANVEC_CACHE, exist_ok=True)
+    d = os.path.join(CANVEC_CACHE, "canvec_15M_CA_Admin")
+    if not os.path.isdir(d):
+        zip_path = os.path.join(CANVEC_CACHE, "canvec_15M_CA_Admin_shp.zip")
+        if not os.path.exists(zip_path):
+            blob = get(CANVEC_URL, timeout=180)
+            if not blob:
+                raise SystemExit("build_aurora_data: could not fetch CanVec from " + CANVEC_URL)
+            # Validate before caching. The zip used to be written here and only
+            # opened afterwards, so a truncated response -- the exact thing a
+            # retry is for -- became a permanent BadZipFile in .cache/ that the
+            # next run could not get past without a manual delete.
+            if not zipfile.is_zipfile(io.BytesIO(blob)):
+                raise SystemExit(
+                    "build_aurora_data: the CanVec download from %s is not a zip (%d bytes). "
+                    "Nothing was cached; re-run." % (CANVEC_URL, len(blob)))
+            tmp = zip_path + ".part"
+            with open(tmp, "wb") as fh:
+                fh.write(blob)
+            os.replace(tmp, zip_path)
+        if not zipfile.is_zipfile(zip_path):
+            raise SystemExit(
+                "build_aurora_data: %s exists but is not a zip. Delete it and re-run."
+                % zip_path)
+        with zipfile.ZipFile(zip_path) as z:
+            z.extractall(CANVEC_CACHE)
+    return d
+
+
+def _dbf_rows(path):
+    """Yield dicts from a dBASE III .dbf. Field names and values are ASCII/UTF-8."""
+    with open(path, "rb") as fh:
+        head = fh.read(32)
+        nrec, hlen, rlen = struct.unpack("<IHH", head[4:12])
+        fields = []
+        while True:                          # 32-byte descriptors, ended by 0x0D
+            raw = fh.read(32)
+            if not raw or raw[0] == 0x0D:
+                break
+            # ESRI dBASE layout: name 0-10, type at 11, length at 16, decimals
+            # at 17. Reading the length from 11 picks up the type character.
+            fields.append((raw[:11].split(b"\x00")[0].decode("latin-1"), raw[16]))
+        fh.seek(hlen)
+        for _ in range(nrec):
+            rec = fh.read(rlen)
+            if len(rec) < rlen:
+                return
+            off, out = 1, {}
+            for name, size in fields:
+                out[name] = rec[off:off + size].decode("utf-8", "replace").strip()
+                off += size
+            yield out
+
+
 def build_geometry():
-    src = "/tmp/ne_50m_admin_1_states_provinces.geojson"
-    if not os.path.exists(src):
-        get("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/"
-            "ne_50m_admin_1_states_provinces.geojson")
-        if not os.path.exists(src):
-            open(src, "wb").write(get("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/"
-                                      "geojson/ne_50m_admin_1_states_provinces.geojson"))
-    gj = json.load(open(src, encoding="utf-8"))
+    d = _canvec_shapes()
+    # The .dbf attributes and the .shp geometry are parallel arrays in the same
+    # order and the same length, so one zip() keeps a record's name attached to
+    # its own outline. Unreadable geometry yields an empty polygon rather than
+    # being skipped, which is what keeps the two arrays aligned.
     feats = []
-    for f in gj["features"]:
-        p = f["properties"]
-        if p.get("adm0_a3") != "CAN":
+    for row, poly in zip(_dbf_rows(os.path.join(d, CANVEC_LAYER + ".dbf")),
+                         _shp_polygons_iter(os.path.join(d, CANVEC_LAYER + ".shp"))):
+        code = str(row.get("juri", "")).strip()
+        if row.get("bodt_en") != "National" or code not in JURISDICTIONS or not poly:
             continue
-
-        def round_coords(c, nd=2):
-            if isinstance(c[0], (int, float)):
-                return [round(c[0], nd), round(c[1], nd)]
-            return [round_coords(x, nd) for x in c]
-
-        def ring_area(ring):
-            a = 0.0
-            for i in range(len(ring) - 1):
-                a += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1]
-            return abs(a) / 2
-
-        def clean(geom):
-            t, c = geom["type"], geom["coordinates"]
-            if t == "Polygon":
-                keep = [c[0]] + [r for r in c[1:] if ring_area(r) > 0.0006]
-                return {"type": "Polygon", "coordinates": [round_coords(r) for r in keep]}
-            out = []
-            for poly in c:
-                keep = [poly[0]] + [r for r in poly[1:] if ring_area(r) > 0.0006]
-                out.append([round_coords(r) for r in keep])
-            return {"type": "MultiPolygon", "coordinates": out}
-
+        outer, holes = poly
+        if _ring_area(outer) <= 0.0015:          # drop specks, keep everything else
+            continue
+        name, abbr, kind = JURISDICTIONS[code]
         feats.append({
             "type": "Feature",
-            "properties": {
-                "name": p.get("name"),
-                "abbr": p.get("postal"),
-                "type_en": p.get("type_en"),
-                "woe_name": p.get("woe_name"),
+            "properties": {"name": name, "abbr": abbr, "type_en": kind, "code": code},
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [[_ring(outer)] + [_ring(h) for h in holes if _ring_area(h) > 0.0015]],
             },
-            "geometry": clean(f["geometry"]),
         })
-    feats.sort(key=lambda f: f["properties"]["name"] or "")
+    # One Feature per jurisdiction: CanVec splits Nunavut into 67 records, and
+    # the map, the legend and the tooltips all want a province to be one thing.
+    merged = {}
+    for f in feats:
+        merged.setdefault(f["properties"]["code"], {
+            "type": "Feature", "properties": f["properties"],
+            "geometry": {"type": "MultiPolygon", "coordinates": []},
+        })["geometry"]["coordinates"].extend(f["geometry"]["coordinates"])
+    out = [merged[k] for k in sorted(merged, key=lambda k: JURISDICTIONS[k][0])]
     w("canada.json", {"type": "FeatureCollection",
-                      "attribution": "Natural Earth (public domain), admin-1 provinces & territories",
-                      "features": feats})
-    print("  provinces:", len(feats))
+                      "attribution": CANVEC_LICENCE,
+                      "credit": CANVEC_CREDIT,
+                      "source": CANVEC_URL,
+                      "basemap": OPENFREEMAP_CREDIT,
+                      "features": out})
+    missing = sorted(set(JURISDICTIONS) - {f["properties"]["code"] for f in out})
+    if missing:
+        raise SystemExit("build_aurora_data: CanVec is missing jurisdictions %s" % missing)
+    polys = sum(len(f["geometry"]["coordinates"]) for f in out)
+    print("  jurisdictions: %d (%d polygons)" % (len(out), polys))
+
+
+def _ring(ring):
+    return [[round(x, 3), round(y, 3)] for x, y in ring]
+
+
+def _shp_polygons_iter(path):
+    """Yield (outer, holes) for every polygon record in a .shp, in file order.
+
+    A shapefile record holds one polygon: ring 0 is the outside, any rings after
+    it are holes cut out of it. The caller has to keep that grouping or lakes
+    fill in solid.
+    """
+    with open(path, "rb") as fh:
+        fh.seek(0)
+        fh.read(100)                            # whole-file header
+        while True:
+            rec = fh.read(8)
+            if len(rec) < 8:
+                return
+            _num, clen = struct.unpack(">II", rec)
+            body = fh.read(clen * 2)
+            if len(body) < 44:
+                return
+            stype = struct.unpack("<I", body[:4])[0]
+            # 3/5/13/15/23/25: PolyLine, Polygon and their Z/M variants
+            if stype not in (3, 5, 13, 15, 23, 25):
+                yield None                     # keep dbf/shp records aligned
+                continue
+            nparts, npts = struct.unpack("<II", body[36:44])
+            parts = struct.unpack("<%dI" % nparts, body[44:44 + nparts * 4])
+            off = 44 + nparts * 4
+            pts = struct.unpack("<%dd" % (npts * 2), body[off:off + npts * 16])
+            rings = []
+            for i, start in enumerate(parts):
+                end = parts[i + 1] if i + 1 < nparts else npts
+                ring = [(pts[j * 2], pts[j * 2 + 1]) for j in range(start, end)]
+                if len(ring) > 3:
+                    rings.append(ring)
+            yield (rings[0], rings[1:]) if rings else None
+
+
+def _ring_area(ring):
+    """Shoelace area in square degrees. Used only to drop specks."""
+    a = 0.0
+    for i in range(len(ring) - 1):
+        a += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1]
+    return abs(a) / 2
 
 
 # ------------------------------------------------------------ 2. case files
@@ -115,7 +271,8 @@ CASES = [
             "Const. Ron O'Brien, one of the responding officers, reported a light about 800 m offshore, being carried "
             "out to sea by the tide and gone before a boat could reach it.",
             "RCMP commandeered two fishing boats and found a trail of yellow foam roughly 24 m wide and 800 m long. "
-            "Some witnesses said it smelled of sulphur. No aircraft was reported missing.",
+            "Some witnesses said it smelled of sulphur. CBC reported that no aircraft were operating in the area at the "
+            "time. That is not the same as no aircraft being reported missing, which is how this read before.",
             "On Friday 6 October a naval diving team searched for two days and found nothing on a flat sand bottom "
             "in good visibility. One fisherman said divers raised aluminium-coloured debris.",
             "On 6 October 1967 Colonel W. W. Turner, director of operations at National Defence headquarters, wrote that "
@@ -201,8 +358,10 @@ CASES = [
                    "\"breaking up\" near Stephenville, one pilot describing it as resembling \"a large vehicle\" "
                    "and another as \"a space launch vehicle\".",
         "detail": [
-            "The sequence begins with a low-level aircraft from Stephenville to Deer Lake reporting an unknown object "
-            "descending at very high speed directly in front of it, near Stephenville.",
+            "The sequence begins with a low-level aircraft on the leg from Goose Bay to Deer Lake reporting an unknown "
+            "object descending at very high speed directly in front of it, near Stephenville. This had been "
+            "written as a flight \u201cfrom Stephenville to Deer Lake\u201d, which inverts it: the CIRVIS report "
+            "gives the routing as CYHZ to CYDF, and Stephenville is CYJT, where the object was.",
             "Within about ten minutes, four aircraft at FL350 reported a rapidly descending large object emitting bright "
             "lights. Pilots could not determine its colour or other specifics beyond its resemblance to a large vehicle.",
             "A Jazz Air crew described something that \"resembled a 'space launch vehicle'.\" The reports were passed to "
@@ -396,8 +555,9 @@ CASES = [
             "The flight was logged with no impact to operations. Transport Canada described the information as "
             "preliminary, unsubstantiated and subject to change, which is what an official record looks like when "
             "it stays inconclusive on purpose.",
-            "Nunavut has no case in this index other than this one, and that imbalance is itself worth noting: the "
-            "federal file is thickest where witnesses are densest.",
+            "Nunavut has no case in this index other than this one. That imbalance is the finding: the "
+            "federal file is thickest where witnesses are densest, and a territory with almost no "
+            "population has almost nothing in it.",
         ],
         "docs": [
             {"label": "Nunatsiaq - pilots spot possible UFO above Nunavut's northern Baffin Island", "url": "https://nunatsiaq.com/stories/article/65674pilots_spot_possible_ufo_above_nunavuts_northern_baffin_island/"},
@@ -517,9 +677,19 @@ TIMELINE = [
     ("1947", "Project Sign era begins", "The first modern sighting wave reaches Canada. Wartime security apparatus in both Canada and the United States is already watching the sky."),
     ("1950", "Project Magnet starts", "The Department of Transport lets engineer Wilbert Smith research, part time, whether UFOs could ride Earth's magnetic field. Smith later sets up a UFO observatory outside Ottawa and launches a balloon over the city to watch for reports. The project is terminated in 1954."),
     ("1952", "Project Second Storey", "The Defence Research Board forms a committee to look at flying saucers crossing Canadian territory as reported by the armed services. It is chaired by the NRC astronomer Dr. Peter Millman."),
-    ("1954", "JANAP 146(C)", "Joint Chiefs of Staff issue Communication Instructions for Reporting Vital Intelligence Sightings from airborne and waterborne sources - the ancestor of the mandatory pilot reports that run for decades."),
-    ("1957", "The federal file opens", "One of the earliest documents in the National Defence UFO file is dated 24 November 1957. The Library and Archives Canada collection eventually runs from 1947 to the early 1980s, about 9,500 digitized documents."),
-    ("1967", "Two cases that stuck", "20 May, Falcon Lake, Manitoba: Stefan Michalak is burned by a disc. 4 October, Shag Harbour, Nova Scotia: an object goes into the water and is never found. Both remain officially unexplained."),
+    # The two entries below are the ones whose citations could not be confirmed.
+    # Both events are real and are described in the Sky Canada Project report, but
+    # neither the "JANAP 146(C)" designation nor the "24 November 1957" document
+    # date appears in it, and neither could be traced to a primary source here.
+    # Kept, with the gap stated, rather than quietly upgraded into a citable fact.
+    ("1954", "A standing reporting instruction", "Joint Chiefs of Staff issue communication instructions for reporting vital intelligence sightings from airborne and waterborne sources - the ancestor of the mandatory pilot reports that run for decades. Secondary sources date this instruction to 1954; the designation usually given for it, JANAP 146(C), could not be confirmed against a primary document here."),
+    ("1957", "The federal file opens", "One of the earliest documents in the National Defence UFO file is dated to the mid-1950s; a commonly cited date is 24 November 1957, which this project could not confirm against a primary document. The Library and Archives Canada collection runs from 1947 to the early 1980s, about 9,500 digitized documents."),
+    # "Officially unexplained" is a claim about a government finding, and only
+    # one of the two has one. Library and Archives Canada's own podcast says the
+    # Department of National Defence "identifies the Falcon Lake incident as
+    # unsolved" (episode 54, 29 May 2019). For Shag Harbour no such statement
+    # was found in the primary record, so the sentence does not make one.
+    ("1967", "Two cases that stuck", "20 May, Falcon Lake, Manitoba: Stefan Michalak is burned by a disc. 4 October, Shag Harbour, Nova Scotia: an object goes into the water and is never found. Defence still identifies the Falcon Lake case as unsolved, and has never said the same about Shag Harbour."),
     ("1967", "The NRC takes over", "On the recommendation of the Minister of National Defence, responsibility for UFO reports transfers to the National Research Council, which runs the file into the 1990s."),
     ("1970", "Maritime reports accumulate", "An RCMP report on a Halifax County sighting of 9 December 1970 lands in the NRC's Herzberg Institute file - one of many Atlantic records that were filed and then forgotten."),
     ("1974", "Gander", "Two nights of airborne encounters over Newfoundland, with a Cessna at 5,000 ft and a Capital Airlines DC-8 both reporting an object; the file is copied to the NRC's Upper Atmosphere Research Section in Ottawa."),
@@ -575,13 +745,26 @@ MEDIA = [
      "len": "long form", "pos": "Makes the \"crash scenario\" argument for Shag Harbour. Included as an example of advocacy framing, not as evidence."},
 ]
 
-# LAC Discover podcast episodes (mp3 resolved at build time when reachable)
+# LAC Discover podcast episodes. The `note` fields used to live only in
+# media.html's hand-written cards, so the JSON that data.html and llms.txt both
+# advertise as the machine-readable source carried none of the substance -- two
+# titles, two durations, two URLs. media.html now renders these instead.
 PODCASTS = [
     {"id": "lac-053", "title": "UFOs at LAC: The Falcon Lake incident, part 1", "len": "1:02:17", "size": "58 MB",
      "published": "15 May 2019",
+     "org": "Library and Archives Canada",
+     "case": "falcon-lake",
+     "note": ("The background: the visit to the site, Michalak's 40-page 1967 manuscript, and what the "
+              "archive actually holds — RCMP and RCAF files, US Air Force and Condon Committee material, "
+              "Mayo Clinic records, and the correspondence that followed."),
      "url": "https://www.canada.ca/en/library-archives/collection/engage-learn/podcasts/discover/episode-053.html"},
     {"id": "lac-054", "title": "UFOs at LAC: The Falcon Lake incident, part 2", "len": "59:22", "size": "54 MB",
      "published": "29 May 2019",
+     "org": "Library and Archives Canada",
+     "case": "falcon-lake",
+     "note": ("The evidence and the investigation: the RCMP officers who could not take Michalak back to the "
+              "site, the 1967–68 medical and military findings, and LAC's own conclusion: that the Department "
+              "of National Defence still identifies the case as unsolved."),
      "url": "https://www.canada.ca/en/library-archives/collection/engage-learn/podcasts/discover/episode-054.html"},
 ]
 
@@ -591,9 +774,10 @@ ENDPOINTS = [
      "url": "https://open.canada.ca/data/api/3/action/package_search?q=UFO",
      "note": "Live JSON. Every dataset on open.canada.ca is queryable. Swap the q= term.",
      "examples": ["?q=UFO", "?q=%22unidentified%20aerial%20phenomena%22", "?q=CADORS"]},
-    {"name": "Open Government search page", "org": "Government of Canada",
-     "url": "https://open.canada.ca/data/en/dataset?q=UFO",
-     "note": "Same catalogue, human-readable."},
+    {"name": "CADORS occurrence data, Open Government Portal", "org": "Transport Canada",
+     "url": "https://open.canada.ca/data/en/dataset/a348c1d1-2392-4595-b5e2-c6a244a7e87f",
+     "note": "The bulk Civil Aviation Daily Occurrence Reporting System data, as CSV, with field metadata. No UFO filter — occurrence type has to be read out of the rows. The only machine-readable file on this list that contains Canadian aviation occurrences at scale.",
+     "examples": ["occurrence information CSV", "occurrence event information CSV"]},
     {"name": "Library and Archives Canada - Canada's UFOs", "org": "Library and Archives Canada",
      "url": "https://www.canada.ca/en/library-archives/collection/research-help/science-technology/ufos.html",
      "note": "Scope page: four origin departments, 1947 to the early 1980s, about 9,500 digitized documents, and the searchable fields."},
@@ -606,6 +790,14 @@ ENDPOINTS = [
     {"name": "LAC research guide - 1967 Shag Harbour sighting", "org": "Library and Archives Canada",
      "url": "https://recherche-research.bac-lac.gc.ca/eng/public/list/43130",
      "note": "Curated path to the Shag Harbour material, including RG 77 volume and microfilm references."},
+    {"name": "CanVec administrative boundaries (FTP, zip)", "org": "Natural Resources Canada",
+     "url": "https://ftp.maps.canada.ca/pub/nrcan_rncan/vector/canvec/shp/Admin/canvec_15M_CA_Admin_shp.zip",
+     "note": "The shapefile this site's map is drawn from: 15 m Admin theme, geo_political_region_2, under the "
+             "Open Government Licence - Canada. 634 KB. Plain HTTP directory listing at the parent path.",
+     "examples": ["canvec_1M_...zip (11.6 MB, higher detail)", "canvec_5M_...zip", "canvec_15M_...zip (634 KB)"]},
+    {"name": "CanVec on the Open Government Portal", "org": "Natural Resources Canada",
+     "url": "https://open.canada.ca/data/dataset/306e5004-534b-4110-9feb-58e3a5c3fd97",
+     "note": "Catalogue record, licence and citation for the same dataset."},
     {"name": "Sky Canada Project - report page", "org": "Office of the Chief Science Advisor",
      "url": "https://science.gc.ca/site/science/en/office-chief-science-advisor/sky-canada-project",
      "note": "Landing page for the June 2025 federal report on UAP reporting in Canada."},
@@ -635,9 +827,16 @@ ENDPOINTS = [
      "note": "An 8,000-page mirror of the declassified Canadian file, filed under original government file numbers. Useful for download; provenance is LAC to NetContents to a 2021 scan."},    {"name": "The 2025 Canadian UFO Survey (Ufology Research)", "org": "Ufology Research",
      "url": "https://img1.wsimg.com/blobby/go/c23c8b29-268f-4742-a45e-2dba156b0e52/Final%20-%20The%202025%20Canadian%20UFO%20Survey.pdf",
      "note": "The successor to the Canadian UFO Survey after ufologyresearch.ca went offline. 26 pages: 1,052 Canadian reports in 2025, and a five-way split of conclusions."},
-    {"name": "CTV News - 17 UAP-like pilot reports in 2023", "org": "CTV News",
-     "url": "https://www.ctvnews.ca/sci-tech/multiple-flights-reported-strange-lights-in-the-sky-over-quebec-during-one-day-in-2023-1.6742406",
-     "note": "Daniel Otis, 26 January 2024. The CADORS pilot-report count that the Sky Canada Project report cites: \"at least 17\" from 2023, with 11 more from 2022."},
+    # The card used to claim this article carried a CADORS pilot-report count of
+    # "at least 17" for 2023 "with 11 more from 2022", and to say the Sky Canada
+    # Project report cites it. Neither is true. The report's footnote 25 is a bare
+    # ctvnews.ca/sci-tech/ section index, and the report's own sentence is that
+    # UAP sightings are "about 0.08% of all incidences reported by pilots" -- it
+    # gives no count. The article itself is about at least three flights over
+    # Quebec on 12 February 2023, obtained with air traffic control audio.
+    {"name": "CTV News - unusual lights over Quebec, February 2023", "org": "CTV News",
+     "url": "https://www.ctvnews.ca/sci-tech/article/multiple-flights-reported-strange-lights-in-the-sky-over-quebec-during-one-day-in-2023/",
+     "note": "Daniel Otis, 26 January 2024. At least three flights reported lights high above the flight path early on 12 February 2023, from air traffic control audio. The closest thing to a published count of pilot-reported UAPs in Canada; the Sky Canada Project report cites a section index rather than this article, and gives only the ratio, not a number."},
     {"name": "Transport Canada - high-altitude object incidents", "org": "Transport Canada",
      "url": "https://tc.canada.ca/en/binder/4-high-altitude-object-incidents",
      "note": "The civil aviation guidance page for objects encountered at altitude - the closest thing Canada has to a UAP reporting procedure."},
@@ -657,17 +856,28 @@ ENDPOINTS = [
 ]
 
 
-# Ufology Research, The Canadian UFO Survey. The 2024 edition is the successor to the
-# retired Canadian UFO Survey series; ufologyresearch.ca no longer resolves, so the
-# current edition is served from the publisher's document host.
-# Ufology Research's Canadian UFO Survey. This file is the single source for
+# Ufology Research's Canadian UFO Survey. This block is the single source for
 # every survey figure on the site: index.html renders the cards from it, and
-# llms.txt advertises it. It used to be a three-row stub that still repeated the
-# "largest edition yet" claim the prose had already been corrected on.
+# llms.txt advertises it. ufologyresearch.ca no longer resolves, so the current
+# edition is served from the publisher's document host.
 #
-# The record is 1,982 reports in 2012; 1,052 in 2025 is the biggest year since
-# 2020 and the fifth highest of the series. Any note that implies otherwise is
-# wrong.
+# Every number here was read out of the 2025 edition PDF itself. Two figures had
+# to be corrected against it, and a comment in this file had claimed they were
+# already right:
+#
+#   probable / insufficient -- the PDF says "about 34 percent" and "about 46
+#     percent". This block carried 33.46 and 46.29: two decimal places the
+#     document does not contain anywhere. A comment here used to assert they had
+#     been "verified against the PDF, which rounds the last two". That was false,
+#     which is why the two figures are now integers and say "about".
+#   catalogued_total -- the PDF says "more than 26,000 ... during the past 35
+#     years". The 24,000 here was Sky Canada's figure as at 2025, which reflects
+#     2023 data rather than the 2025 edition.
+#
+# The year table in the PDF covers 2018-2025 only, so "the biggest year since
+# 2020" is checkable against it and a rank across the full 1989-2025 series is
+# not. An earlier version of this comment called 2025 "the fifth highest on
+# record"; nothing here can support that, so it is gone.
 SURVEY = [
     {"year": "2012", "reports": 1982, "note": "The record for the survey's history."},
     {"year": "2019", "reports": 849},
@@ -677,9 +887,13 @@ SURVEY = [
     {"year": "2023", "reports": 570, "note": "The figure the Sky Canada Project report cites."},
     {"year": "2024", "reports": 1008, "unexplained_pct": 3.77, "explained_pct": 14,
      "note": "Fewer than four per cent unexplained."},
+    # unexplained_pct, explained_pct and long_run_unexplained_pct are the
+    # survey's own two-decimal figures. probable and insufficient are the ones
+    # it only reports as "about 34 percent" and "about 46 percent".
     {"year": "2025", "reports": 1052, "unexplained_pct": 3.42, "explained_pct": 16.83,
-     "probable_pct": 33.46, "insufficient_pct": 46.29,
+     "probable_pct": 34, "insufficient_pct": 46,
      "long_run_unexplained_pct": 10.22,
+     "long_run_years": 35,
      "nocturnal_pct": 50.24,
      "top_shape": "point source of light",
      "top_shape_pct": 52,
@@ -687,19 +901,18 @@ SURVEY = [
      "avg_duration_min": 47,
      "prev_avg_duration_min": {"2024": 36, "2023": 16, "2022": 13},
      "by_province": {"ON": 307, "QC": 210, "BC": 131},
-     "note": ("One report every eight hours, the biggest year since 2020 and the fifth highest "
-              "on record. 36 of the 1,052 were unexplained, against a 10.22% average over the "
-              "preceding 35 years. The survey's own caveat: a report of 'unknown' does not imply "
-              "alien visitation.")},
+     "note": ("One report every eight hours, and the biggest year since 2020. 36 of the 1,052 were "
+              "unexplained, against a 10.22% average over the preceding 35 years. The survey's own "
+              "caveat: a report of 'unknown' does not imply alien visitation.")},
 ]
 
-# The series runs since 1989 and totals more than 24,000 reports.
+# The series runs since 1989. The 2025 edition says "more than 26,000 Canadian
+# UFO reports have been catalogued during the past 35 years".
 SURVEY_META = {
     "publisher": "Ufology Research",
-    "series_url": "https://img1.wsing.com/blobby/go/c23c8b29-268f-4742-a45e-2dba156b0e52/final%20-%20The%202025%20Canadian%20UFO%20Survey.pdf",
+    "series_url": "https://img1.wsimg.com/blobby/go/c23c8b29-268f-4742-a45e-2dba156b0e52/Final%20-%20The%202025%20Canadian%20UFO%20Survey.pdf",
     "since": 1989,
-    "catalogued_total": 24000,
-    "prior_years": [2019, 2020, 2021, 2022, 2023, 2024],
+    "catalogued_total": 26000,
 }
 
 if __name__ == "__main__":

@@ -126,15 +126,16 @@ def main():
         titled += bool(r["doc_title"])
         dated += not r["doc_date"].startswith("[")
         located += not r["location"].startswith("[")
-    summary = {
-        "total": len(records), "queries": queries, "by_group": counts, "by_route": vias,
-        "with_title": titled, "with_doc_date": dated, "with_location": located,
-        "provinces_searched": PROVINCES,
-        "note": "LAC browse caps each query at 50 rows and its sk pagination repeats the last page; "
-                "coverage here is the union of %d distinct queries, not the whole collection." % queries,
-    }
-    with open(os.path.join(OUT, "lac_summary.json"), "w", encoding="utf-8") as f:
-        json.dump(summary, f, ensure_ascii=False, indent=1)
+    # This used to also write data/lac_summary.json. It no longer does: that file
+    # drifted out of date (it kept reporting with_title: 199 from before a second
+    # title pass) while sitting next to data/lac_counts.json saying something
+    # different about the same rows, and a build assertion read the wrong one.
+    # build_site_data.py now writes site/data/lac_stats.json from lac_full.json --
+    # the same rows -- so there is one number per fact and it is regenerated every
+    # build. This block is the console report only.
+    print("\n%d queries. LAC browse caps each at 50 rows and its sk pagination repeats "
+          "the last page, so coverage is the union of these, not the whole collection."
+          % queries)
 
     print("\nTOTAL %d descriptions from %d queries" % (len(records), queries))
     for g, c in sorted(counts.items(), key=lambda kv: -kv[1]):

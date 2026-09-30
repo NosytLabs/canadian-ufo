@@ -57,21 +57,21 @@
 </header>
 
 <main id="main">
-  <section class="hero" style="padding-bottom:8px">
+  <section class="hero hero-tight">
     <div class="hero-inner hero-1col">
       <div>
         <p class="kicker">Archival index · 1,510 descriptions · 59 queries · 4 record groups</p>
-        <h1 style="font-size:clamp(36px,6vw,70px)">The whole index, in one table</h1>
-        <p class="hero-lede" style="max-width:76ch">
+        <h1 class="hero-h1-md">The whole index, in one table</h1>
+        <p class="hero-lede">
           Library and Archives Canada holds roughly 9,500 digitized documents on UFOs, accumulated between
           1947 and the early 1980s by four federal bodies: the Department of National Defence, the Department
           of Transport, the National Research Council and the RCMP. What follows is that database's own index —
           1,510 descriptions, sortable, with a direct link into the live record for every entry.
         </p>
-        <p class="hero-lede" style="max-width:76ch">
-          This is an <em>index</em>, not the documents. Every entry carries a description and a record
-          number; 1,357 of them also carry a document date and 1,311 name a location. Sighting dates are
-          free text and are mostly absent, which is LAC's own caveat rather than a limit of this scrape.
+        <p class="hero-lede">
+          This is an <em>index</em>, not the documents. Every entry carries a record number and a link into
+          the live record; 1,357 of them also carry a document date and 1,311 name a location. Sighting dates
+          are free text and are mostly absent, which is LAC's own caveat rather than a limit of this scrape.
         </p>
       </div>
     </div>
@@ -88,30 +88,42 @@
     <div class="grid g-4">
       <article class="card">
         <h3>National Defence</h3>
-        <p style="margin-top:10px">552 descriptions, the largest group, filed as “Intelligence: Sighting
-          of unknown objects” and cross-referenced to microfilm reel T-3291. Fonds ISN 13019. Almost every
-          province-by-group query lands here, which is why this group grew the most.</p>
+        <p class="mt-1">552 descriptions, the largest group, across three series. The biggest is
+          “Intelligence: Sighting of unknown objects”, cross-referenced to microfilm reel T-3291 (320
+          entries); 203 sit in the Herzberg file and 29 under “Target detection: Search: Flying saucers”.
+          Fonds ISN 13019. Almost every province-by-group query lands here, which is why this group grew
+          the most.</p>
         <div class="chips meta"><span class="chip chip-a">552 indexed</span></div>
       </article>
       <article class="card">
         <h3>Transport</h3>
-        <p style="margin-top:10px">52 descriptions, filed under “Transportation: General: Unidentified
-          Flying Objects”. Civil aviation and marine reporting. Fonds ISN 37061.</p>
+        <p class="mt-1">52 descriptions: 50 under “Transportation: General: Unidentified Flying
+          Objects” and 2 under the CIRVIS/MERINT series. Civil aviation and marine reporting. Fonds ISN
+          37061.</p>
         <div class="chips meta"><span class="chip chip-a">52 indexed</span></div>
       </article>
       <article class="card">
         <h3>National Research Council</h3>
-        <p style="margin-top:10px">396 descriptions held by the Herzberg Institute of Astrophysics as
-          “Reports on non-meteoric sightings”. The scientific file, kept after the 1967 transfer of
-          responsibility. Fonds ISN 1017 / 4693.</p>
+        <p class="mt-1">396 descriptions, every one of them held by the Herzberg Institute of
+          Astrophysics as “Reports on non-meteoric sightings”. The scientific file, kept after the 1967
+          transfer of responsibility. Fonds ISN 1017 / 4693.</p>
         <div class="chips meta"><span class="chip chip-a">396 indexed</span></div>
       </article>
       <article class="card">
         <h3>RCMP</h3>
-        <p style="margin-top:10px">510 descriptions recorded as national research requests routed through
-          police files, often citing the Radio and Electrical Engineering Division. Fonds ISN 37024.</p>
+        <p class="mt-1">510 descriptions, all of them filed as national research requests routed
+          through police files, citing the Radio and Electrical Engineering Division. Fonds ISN 37024.</p>
         <div class="chips meta"><span class="chip chip-a">510 indexed</span></div>
       </article>
+    </div>
+    <div class="card" >
+      <div class="readout-label">How to read the Description column</div>
+      <p class="mt-2">It is a <em>series title</em>, not a summary of the individual document, and
+        there are only seven distinct values across all 1,510 rows. LAC files its UFO collection as numbered
+        series and gives each one a standing title; a row tells you which series a record belongs to, its
+        record number, and where to fetch it. It does not tell you what is on the page. The documents
+        themselves are scanned images and are not described at item level — that is a limitation of the
+        source, and no amount of scraping gets around it.</p>
     </div>
   </section>
 
@@ -127,31 +139,31 @@
     <div class="grid g-3">
       <article class="card">
         <div class="readout-label">The cap</div>
-        <p style="margin-top:12px">Every query returns at most <strong>50 rows</strong>, whatever the
+        <p class="mt-2">Every query returns at most <strong>50 rows</strong>, whatever the
           result set. There is no total count anywhere on the page, so the interface gives you no way to know
           how much you are not seeing.</p>
       </article>
       <article class="card">
         <div class="readout-label">The broken pagination</div>
-        <p style="margin-top:12px">The <code>sk</code> parameter looks like an offset and it is not. Page two
+        <p class="mt-2">The <code>sk</code> parameter looks like an offset and it is not. Page two
           jumps to the <em>last</em> fifty records, and every page after that returns those same fifty
           records again. Paging through the National Research Council file yields fifty distinct records
           and then repeats forever.</p>
       </article>
       <article class="card">
         <div class="readout-label">The workaround</div>
-        <p style="margin-top:12px">The only way deeper is to vary the query. AURORA runs <strong>59 of
+        <p class="mt-2">The only way deeper is to vary the query. AURORA runs <strong>59 of
           them</strong>: four record groups, eleven provinces, and all forty-four province-by-group pairings,
           then takes the union. That turns 206 visible records into 1,510.</p>
       </article>
     </div>
-    <div class="quote" style="margin-top:24px">
+    <div class="quote" >
       <blockquote>A single query returns the first fifty rows and the last fifty rows, and nothing in
         between. The archive was never incomplete. It was just not reachable through the interface that
         describes it.</blockquote>
       <cite>Measured against the live database, September 2026 · reproducible with the query patterns below</cite>
     </div>
-    <div class="grid g-2" style="margin-top:24px">
+    <div class="grid g-2" >
       <div class="prose">
         <p><strong>What this means for the numbers on this site.</strong> 1,510 is a floor, not a total.
           Every description LAC holds that can be reached by varying the query is here, and the collection
@@ -164,16 +176,25 @@
           guessing.</p>
       </div>
       <div class="card">
-        <h3>One record, found this way</h3>
-        <p style="margin-top:12px">The province query for Nova Scotia returns a description that the
-          record-group query for National Defence never shows: an intelligence file whose location field
-          reads <strong>Shelburne County, NS</strong> and whose microfilm is reel T-3291. Shelburne was the
-          site of a United States naval submarine-tracking installation, and the object in question is the
-          one that entered the water off Shag Harbour six kilometres away on 4 October 1967.</p>
-        <p style="margin-top:12px">That record is invisible to anyone who queries by department alone. It is
-          here because the scraper asked about Nova Scotia as well as about Defence.</p>
+        <h3>Twenty-two records, found this way</h3>
+        <p class="mt-2">Query the National Research Council record group on its own and you get 49
+          rows — all of them with no location cited at all. Now add <code>?q4=NS</code> to the same query and a
+          further 22 rows appear, every one of them reading
+          <strong>Barrington Passage, NS</strong>, sighting date <strong>10/5/1967</strong>, filed between
+          15 November and 19 December 1967. That is the paper trail for the Shag Harbour sighting of
+          4 October 1967: Barrington Passage and Shag Harbour are both in the Municipality of the District
+          of Barrington, Shelburne County.</p>
+        <p class="mt-2">Not one of the 22 is reachable from the record-group query alone. Asking
+          about Nova Scotia <em>and</em> the NRC is the only way in, and asking only about the NRC is the only
+          way LAC presents them — as 49 records with nothing in the location column.</p>
+        <div class="chips meta">
+          <span class="chip chip-a">ISN 4733</span>
+          <span class="chip">UAR/N/215-225</span>
+          <span class="chip">MIKAN 134925</span>
+        </div>
         <div class="meta">
-          <a class="btn" href="case-shag-harbour.html">Read the Shag Harbour case file</a>
+          <a class="btn" href="https://www.collectionscanada.gc.ca/databases/ufo/001057-119.01-e.php?&isn_id_nbr=4733&page_id_nbr=3935&record_id=4733-3935-9997&interval=50" target="_blank" rel="noopener">Open one in LAC's database</a>
+          <a class="btn" href="case-shag-harbour.html">Read the case file</a>
         </div>
       </div>
     </div>
@@ -202,7 +223,7 @@
 
     <div class="table-wrap">
       <table id="arc-table">
-        <caption class="sr">Indexed descriptions from Library and Archives Canada's UFO collection, 1947 to the early 1980s</caption>
+        <caption class="sr-only">Indexed descriptions from Library and Archives Canada's UFO collection, 1947 to the early 1980s</caption>
         <thead>
           <tr>
             <th scope="col"><button data-sort="rid" type="button">Record</button></th>
@@ -217,7 +238,7 @@
         <tbody id="arc-body" aria-live="polite"><tr><td colspan="7"><p class="spinner">Loading the archival index…</p></td></tr></tbody>
       </table>
     </div>
-    <div class="filters" id="arc-pager" style="margin-top:20px"></div>
+    <div class="filters" id="arc-pager"></div>
     <noscript><div class="noscript-note"><p><b>This section is assembled in the browser.</b> The same records are in the site’s data files — <code>data/lac.json</code> — so nothing is missing, but nothing is pre-rendered either.</p></div></noscript>
   </section>
 

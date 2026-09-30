@@ -4,7 +4,7 @@
 
   var A = window.Aurora;
   var $ = A.$, $$ = A.$$, ready = A.ready, fetchJSON = A.fetchJSON, esc = A.esc;
-  var narrow = A.narrow, singleColumn = A.singleColumn;
+  var narrow = A.narrow;
 
   /* ------------------------------------------------------------- chrome */
   ready(function () {
@@ -25,19 +25,19 @@
       });
     }
 
-    // FAQ accordions: open by default for crawlers and on wide screens, first
-    // one only on narrow. The state used to be set once at load, so crossing the
-    // breakpoint left every answer collapsed (or every answer open) until a
-    // reload.
+    // FAQ accordions. One open at a time: six answers expanded at once is a
+    // wall of text that pushed the page past a thousand pixels on its own, and
+    // a closed <details> is still in the DOM for crawlers and screen readers.
+    // The state is re-applied on a breakpoint change, so crossing it never
+    // leaves every answer collapsed until a reload.
     var faqs = $$(".qa details");
-    function setFaqState(isSingle) {
-      faqs.forEach(function (d, i) { d.open = isSingle ? i === 0 : true; });
+    function setFaqState() {
+      faqs.forEach(function (d, i) { d.open = i === 0; });
     }
-    // The breakpoint string lives in core.js, next to the CSS it mirrors.
     var faqMQ = window.matchMedia("(max-width: 940px)");
-    setFaqState(singleColumn());
-    if (faqMQ.addEventListener) faqMQ.addEventListener("change", function (e) { setFaqState(e.matches); });
-    else if (faqMQ.addListener) faqMQ.addListener(function (e) { setFaqState(e.matches); });
+    setFaqState();
+    if (faqMQ.addEventListener) faqMQ.addEventListener("change", setFaqState);
+    else if (faqMQ.addListener) faqMQ.addListener(setFaqState);
   });
 
   /* ------------------------------------------------------------ releases */
@@ -118,23 +118,9 @@
       host.innerHTML = slice.length
         ? slice.map(card).join("")
         : '<div class="error-note">No records match those filters.</div>';
-      var pag = $("#doc-pager");
-      if (pag) {
-        if (pages <= 1) { pag.innerHTML = ""; return; }
-        var h = '<button class="chip" data-p="' + (page - 1) + '"' + (page === 0 ? " disabled" : "") + ">Prev</button>";
-        for (var i = 0; i < pages; i++) {
-          if (pages > 9 && Math.abs(i - page) > 1 && i !== 0 && i !== pages - 1) {
-            if (Math.abs(i - page) === 2) h += '<span class="chip">…</span>';
-            continue;
-          }
-          h += '<button class="chip' + (i === page ? " chip-a" : "") + '" data-p="' + i + '">' + (i + 1) + "</button>";
-        }
-        h += '<button class="chip" data-p="' + (page + 1) + '"' + (page === pages - 1 ? " disabled" : "") + ">Next</button>";
-        pag.innerHTML = h;
-        $$("#doc-pager button").forEach(function (b) {
-          b.addEventListener("click", function () { page = parseInt(b.dataset.p, 10); draw(); host.scrollIntoView({ block: "nearest" }); });
-        });
-      }
+      pager($("#doc-pager"), page, pages, function (p) {
+        page = p; draw(); host.scrollIntoView({ block: "nearest" });
+      });
     }
 
     function wire() {
@@ -173,7 +159,7 @@
           var n = docs.filter(function (d) { return d.release === r.n; }).length;
           return '<details open><summary><span class="doc-id">Release ' + esc(r.n) + " &middot; " + esc(r.date) +
             "</span><br>" + esc(r.title) + ' <span class="chip">' + n + (n === 1 ? " record" : " records") + "</span></summary>" +
-            '<p style="color:var(--muted);margin:10px 0 0;max-width:72ch">' + esc(r.blurb) + "</p></details>";
+            '<p class="prose-note">' + esc(r.blurb) + "</p></details>";
         }).join("");
       }
       draw();
@@ -238,23 +224,7 @@
           '<td><a href="' + esc(r.url) + '" target="_blank" rel="noopener">open record</a></td></tr>';
       }).join("") || '<tr><td colspan="7" class="none">Nothing matches that search.</td></tr>';
 
-      var pag = $("#arc-pager");
-      if (pag) {
-        if (pages <= 1) { pag.innerHTML = ""; return; }
-        var h = '<button class="chip" data-p="' + (page - 1) + '"' + (page === 0 ? " disabled" : "") + ">Prev</button>";
-        for (var i = 0; i < pages; i++) {
-          if (pages > 10 && Math.abs(i - page) > 1 && i !== 0 && i !== pages - 1) {
-            if (Math.abs(i - page) === 2) h += '<span class="chip">…</span>';
-            continue;
-          }
-          h += '<button class="chip' + (i === page ? " chip-a" : "") + '" data-p="' + i + '">' + (i + 1) + "</button>";
-        }
-        h += '<button class="chip" data-p="' + (page + 1) + '"' + (page === pages - 1 ? " disabled" : "") + ">Next</button>";
-        pag.innerHTML = h;
-        $$("#arc-pager button").forEach(function (b) {
-          b.addEventListener("click", function () { page = parseInt(b.dataset.p, 10); draw(); });
-        });
-      }
+      pager($("#arc-pager"), page, pages, function (p) { page = p; draw(); });
     }
 
     function wire() {
@@ -292,34 +262,79 @@
   }
 
   /* --------------------------------------------------------------- cases */
+  // The chip wording used to be a second table here, and it had already drifted
+  // from map.js's: the map said "Mainstream reporting, named sources" and this
+  // said "Mainstream reporting". Both now read Aurora.CONF in core.js.
+  // One card, two call sites: the full index and the five-case teaser on the
+  // overview page. Keeping a single renderer is the point — the teaser used to
+  // be a hand-typed second copy that drifted.
+  function caseCard(c) {
+    var cl = Aurora.conf(c.conf);
+    return '<article class="card conf-' + (Aurora.CONF[c.conf] ? c.conf : "partial") +
+      '" data-case-card="' + esc(c.slug) + '" id="' + esc(c.slug) + '">' +
+      '<div class="chips card-chips"><span class="chip ' + cl.chip + '">' + cl.short + "</span>" +
+        '<span class="chip">' + esc(c.display) + "</span>" +
+        (c.prov ? '<span class="chip">' + esc(c.prov) + "</span>" : "") +
+        (c.tag ? '<span class="chip">' + esc(c.tag) + "</span>" : "") + "</div>" +
+      "<h3>" + esc(c.title) + "</h3><p>" + esc(c.summary) + "</p>" +
+      '<div class="meta"><a class="btn" href="case-' + esc(c.slug) + '.html">Open case file</a></div></article>';
+  }
+
+  function sortCases(cases) {
+    var order = { primary: 0, reported: 1, partial: 2 };
+    return cases.slice().sort(function (a, b) {
+      var d = (order[a.conf] || 0) - (order[b.conf] || 0);
+      if (d) return d;
+      if (a.date === b.date) return a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0;
+      return a.date < b.date ? 1 : -1;  // newest first
+    });
+  }
+
   function renderCases() {
     var host = $("#case-grid");
     if (!host) return;
     fetchJSON("data/cases.json").then(function (cases) {
-      var order = { primary: 0, reported: 1, partial: 2 };
-      var sorted = cases.slice().sort(function (a, b) {
-        var d = (order[a.conf] || 0) - (order[b.conf] || 0);
-        if (d) return d;
-        if (a.date === b.date) return a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0;
-        return a.date < b.date ? 1 : -1;  // newest first
-      });
-      var confLabel = {
-        primary: ["chip-a", "Archival or official record"],
-        reported: ["chip", "Mainstream reporting"],
-        partial: ["chip-amb", "Thin sourcing"]
-      };
-      host.innerHTML = sorted.map(function (c) {
-        var cl = confLabel[c.conf] || confLabel.partial;
-        return '<article class="card" data-case-card="' + esc(c.slug) + '" id="' + esc(c.slug) + '">' +
-          '<div class="chips" style="margin-bottom:12px"><span class="chip ' + cl[0] + '">' + cl[1] + "</span>" +
-            '<span class="chip">' + esc(c.display) + "</span>" +
-            (c.prov ? '<span class="chip">' + esc(c.prov) + "</span>" : "") +
-            (c.tag ? '<span class="chip">' + esc(c.tag) + "</span>" : "") + "</div>" +
-          "<h3>" + esc(c.title) + "</h3><p>" + esc(c.summary) + "</p>" +
-          '<div class="meta"><a class="btn" href="case-' + esc(c.slug) + '.html">Open case file</a></div></article>';
-      }).join("");
+      host.innerHTML = sortCases(cases).map(caseCard).join("");
     }).catch(function (e) {
       host.innerHTML = '<div class="error-note">Could not load case files: ' + e.message + "</div>";
+    });
+  }
+
+  /* The overview page shows the archival-grade cases only. The other thirteen
+     are one click away, and repeating all eighteen made the front page a
+     second copy of case.html. */
+  function renderFeaturedCases() {
+    var host = $("#case-featured");
+    if (!host) return;
+    fetchJSON("data/cases.json").then(function (cases) {
+      var best = sortCases(cases).filter(function (c) { return c.conf === "primary"; });
+      host.innerHTML = best.map(caseCard).join("");
+    }).catch(function (e) {
+      host.innerHTML = '<div class="error-note">Could not load case files: ' + e.message + "</div>";
+    });
+  }
+
+  /* --------------------------------------------------------- release teaser
+     A row per tranche, not a card grid. Five cards in a three-up grid leaves
+     one card stranded on its own row, and the blurb lengths are uneven enough
+     that the cards came out mostly empty. Rows also read as the index they
+     are. The per-tranche date is deliberately not shown here: every entry
+     carries the same one, because it is the date AURORA indexed them, not the
+     date the material was released. releases.html keeps it. */
+  function renderTranches() {
+    var host = $("#tranche-grid");
+    if (!host) return;
+    fetchJSON("data/releases.json").then(function (r) {
+      host.innerHTML = '<ol class="tranches">' + r.releases.map(function (t) {
+        return '<li class="tranche">' +
+          '<div class="tranche-n">' + esc(t.n) + "</div>" +
+          '<div class="tranche-body"><h3>' + esc(t.title) + "</h3>" +
+            "<p>" + esc(t.blurb) + "</p></div>" +
+          '<a class="btn tranche-go" href="releases.html#tranches">Open<span class="sr-only"> tranche ' +
+            esc(t.n) + ", " + esc(t.title) + "</span> &rarr;</a></li>";
+      }).join("") + "</ol>";
+    }).catch(function (e) {
+      host.innerHTML = '<div class="error-note">Could not load the release index: ' + e.message + "</div>";
     });
   }
 
@@ -352,7 +367,7 @@
           return '<article class="card" id="' + esc(m.id) + '">' +
             '<div class="card-media poster">' + frame + "</div>" +
             "<h3>" + esc(m.title) + "</h3>" +
-            '<p class="meta" style="color:var(--muted);font-size:12.5px">' + esc(m.publisher) + " &middot; " + esc(m.date) + (m.len && m.len !== "long form" ? " &middot; " + esc(m.len) : "") + "</p>" +
+            '<p class="card-sub">' + esc(m.publisher) + " &middot; " + esc(m.date) + (m.len && m.len !== "long form" ? " &middot; " + esc(m.len) : "") + "</p>" +
             "<p>" + esc(m.pos) + "</p>" +
             (linked ? '<div class="chips meta">' + linked + "</div>" : "") + "</article>";
         }).join("");
@@ -379,17 +394,65 @@
       });
   }
 
+  /* ---------------------------------------------------------- podcasts */
+  // media.html's two podcast cards were hand-typed into the markup while
+  // data/podcasts.json -- which data.html and llms.txt both advertise as the
+  // machine-readable source -- carried nothing but two titles and two URLs. The
+  // prose lived in one place and the data in another; now the data is the source
+  // and this renders it.
+  function renderPodcasts() {
+    var host = $("#podcast-grid");
+    if (!host) return;
+    fetchJSON("data/podcasts.json")
+      .then(function (rows) {
+        host.innerHTML = rows.map(function (p) {
+          return '<article class="card">' +
+            "<h3>" + esc(p.title) + "</h3>" +
+            '<p class="card-sub">Published ' + esc(p.published) + " &middot; " +
+              esc(p.len) + " &middot; " + esc(p.size) + " MP3</p>" +
+            "<p>" + esc(p.note) + "</p>" +
+            '<div class="chips card-chips"><span class="chip chip-a">' + esc(p.org) + "</span>" +
+              (p.case ? '<span class="chip"><a href="case-' + esc(p.case) + '.html">Case file</a></span>' : "") +
+            "</div>" +
+            '<div class="meta"><a class="btn btn-primary" href="' + esc(p.url) +
+              '" target="_blank" rel="noopener">Listen or download</a></div></article>';
+        }).join("");
+      })
+      .catch(function (e) {
+        host.innerHTML = '<div class="error-note">Could not load the podcast list: ' + e.message + "</div>";
+      });
+  }
+
   /* ----------------------------------------------------------- endpoints */
   function renderEndpoints() {
     var host = $("#ep-list");
     if (!host) return;
+    // Not every URL here answers an automated request. Two canada.ca paths
+    // stall scripted clients while serving the same page to a browser, and
+    // NUFORC 403s anything that is not a person. Saying so on the list beats
+    // a claim that everything returned 200.
+    var CAVEAT = {
+      "www.canada.ca": "Serves browsers, stalls scripts. Open it in a tab.",
+      "nuforc.org": "Blocks non-browser clients. Open it in a tab."
+    };
+    function caveatFor(url) {
+      var m = /:\/\/([^/]+)/.exec(url || "");
+      return m ? CAVEAT[m[1]] : null;
+    }
     fetchJSON("data/endpoints.json").then(function (eps) {
       host.innerHTML = eps.map(function (e) {
+        var cav = caveatFor(e.url);
         return "<li><span class=\"bullet\"></span><div>" +
           "<a href=\"" + esc(e.url) + "\" target=\"_blank\" rel=\"noopener\">" + esc(e.name) + "</a>" +
           ' <span class="chip">' + esc(e.org) + "</span>" +
+          (cav ? ' <span class="chip chip-amb">' + esc(cav) + "</span>" : "") +
           '<div class="desc">' + esc(e.note) + "</div>" +
           "<div class=\"desc\"><code>" + esc(e.url) + "</code></div>" +
+          (e.examples && e.examples.length
+            ? '<div class="desc">Try: ' + e.examples.map(function (x) {
+                return "<code>" + esc(x) + "</code>";
+              }).join(" ") + "</div>"
+            : "") +
           "</div></li>";
       }).join("");
     }).catch(function (e) {
@@ -398,35 +461,84 @@
   }
 
   /* --------------------------------------------------------- CKAN search */
+  /* Two things about this call that are not obvious from the code.
+   *
+   * 1. open.canada.ca sends `Access-Control-Allow-Origin:
+   *    https://nosytlabs.github.io` and no other origin. The query therefore
+   *    works on the deployed site and CANNOT work on localhost -- the browser
+   *    blocks it and fetch rejects with "Failed to fetch", which is not a bug in
+   *    this file. Verified: an Origin of http://127.0.0.1 gets no ACAO header
+   *    at all, while https://nosytlabs.github.io gets exactly that. If the site
+   *    ever moves to a custom domain this feature dies silently, and the fix is
+   *    to get the new origin added to open.canada.ca's allowlist.
+   *
+   * 2. The catalogue's own identifier is a UUID and the API returns no page URL
+   *    anywhere: on a live result `url` is null, `gc_catalogue_number` is an
+   *    empty string and `program_page_url` is a pair of empty strings. This used
+   *    to link straight to `d.name`, so every result rendered as a dead relative
+   *    link to a UUID. The portal's dataset page is /data/en/dataset/<uuid>,
+   *    which does resolve and lands on the dataset the API described.
+   *
+   * Also worth knowing when reading the results: this catalogue returns nothing
+   * for UFO, UAP, "unidentified aerial" or CADORS. "aerial phenomenon" returns
+   * one dataset, about coastal dynamics. That is the site's own thesis, and it
+   * is checkable from the reader's own browser, which is the point of the form.
+   */
+  var CATALOGUE = "https://open.canada.ca/data/en/dataset/";
+  function datasetUrl(d) {
+    var id = d && (d.name || d.id);
+    if (!id || !/^[0-9a-f-]{36}$/i.test(id)) return null;
+    return CATALOGUE + id;
+  }
+
   function wireCkan() {
     var form = $("#ckan-form");
     if (!form) return;
     var input = $("#ckan-q");
     var out = $("#ckan-out");
+    // Two queries can be in flight at once and the slower one to *resolve* wins,
+    // not the one submitted last, so a fast early reply can overwrite a slow
+    // later one. Tag each request and ignore a reply that is no longer the
+    // current one.
+    var current = 0;
     var go = function () {
-      var q = (input.value || "UFO").trim();
+      var q = (input.value || "").trim() || "aerial phenomenon";
+      var mine = ++current;
       out.innerHTML = '<p class="spinner">Querying open.canada.ca…</p>';
       var url = "https://open.canada.ca/data/api/3/action/package_search?rows=6&q=" + encodeURIComponent(q);
       fetch(url).then(function (r) {
         if (!r.ok) throw new Error("open.canada.ca → " + r.status);
         return r.json();
       }).then(function (j) {
+        if (mine !== current) return;
+        if (j.success !== true) throw new Error("the API answered success:false");
         var res = (j.result && j.result.results) || [];
         if (!res.length) {
-          out.innerHTML = '<p style="color:var(--muted)">Nothing in the open catalogue matched “' + esc(q) +
-            '”. A full-text miss is not proof that no such dataset exists, so this is a starting point rather than a result — try a broader term.</p>';
+          // Worth saying plainly: this is the site's own thesis, checkable.
+          // Searches for UFO, UAP, unidentified aerial and CADORS all return
+          // nothing from this catalogue, and "aerial phenomenon" returns one.
+          out.innerHTML = '<p class="note">Nothing in the open catalogue matched “' + esc(q) +
+            '”. That is not an outage. Searches for UFO, UAP, unidentified aerial phenomena and CADORS ' +
+            'all return zero datasets from this catalogue, and the Sky Canada Project recommends naming ' +
+            'a department responsible for UAP data precisely because there is none to find.</p>';
           return;
         }
-        out.innerHTML = '<p style="color:var(--muted);margin:0 0 12px">' +
+        out.innerHTML = '<p class="search-note">' +
           ((j.result && j.result.count) || res.length) + " datasets in the Government of Canada open catalogue</p>" +
           '<ul class="linklist">' + res.map(function (d) {
-            return '<li><span class="bullet"></span><div><a href="' + esc(d.name) + '" target="_blank" rel="noopener">' +
-              esc(d.title || d.name) + '</a><div class="desc">' + esc((d.notes || "").replace(/<[^>]+>/g, "").slice(0, 220)) +
+            var href = datasetUrl(d);
+            var title = esc(d.title || d.name);
+            return '<li><span class="bullet"></span><div>' +
+              (href ? '<a href="' + esc(href) + '" target="_blank" rel="noopener">' + title + "</a>"
+                    : "<b>" + title + "</b>") +
+              '<div class="desc">' + esc((d.notes || "").replace(/<[^>]+>/g, "").slice(0, 220)) +
               "</div></div></li>";
           }).join("") + "</ul>";
       }).catch(function (e) {
-        out.innerHTML = '<p style="color:var(--muted)">That live query failed (' + esc(e.message) +
-          "). The endpoint is still worth trying directly: open.canada.ca CKAN API.</p>";
+        if (mine !== current) return;
+        if (window.console && console.warn) console.warn("AURORA CKAN search", e);
+        out.innerHTML = '<p class="note">That live query did not come back (' + esc(e.message) +
+          "). The endpoint is worth trying directly: <code>open.canada.ca/data/api/3/action/package_search</code>.";
       });
     };
     form.addEventListener("submit", function (e) { e.preventDefault(); go(); });
@@ -435,9 +547,15 @@
   }
 
   /* ------------------------------------------------------ survey series */
-  /* Every survey figure on the site comes from data/survey.json. They used to
-     be typed into index.html as well, which is how the JSON kept saying "the
-     largest edition yet" after the prose had been corrected. */
+  /* The counts, percentages, run times and provincial splits all come from
+     data/survey.json. They used to be typed into index.html as well, which is
+     how the JSON kept saying "the largest edition yet" after the prose had
+     already been corrected.
+
+     Three things in here are still prose rather than data, and are marked as
+     such below: the "about 5%" derived from disc_reports, the 35-year baseline,
+     and the one card that quotes the CADORS ratio instead of a report count.
+     If any of them moves, it moves here. */
   function renderSurvey() {
     var cards = $("#survey-cards"), stats = $("#survey-stats");
     if (!cards) return;
@@ -458,19 +576,21 @@
          (peak ? " \u2014 and the record is " + fmt(peak.reports) + " in " + peak.year + "." : ".")],
         ["Left unexplained", cur.unexplained_pct + "%",
          fmt(unexplainedCount) + " of " + fmt(cur.reports) + " reports. Averaged over the survey's " +
-         "preceding 35 years the unexplained share is " + cur.long_run_unexplained_pct +
+         "preceding " + (cur.long_run_years || 35) + " years the unexplained share is " +
+         cur.long_run_unexplained_pct +
          "%, so this is among the lowest readings it has ever posted."],
         ["Insufficient evidence", cur.insufficient_pct + "%",
          "The largest single bucket. " + cur.probable_pct + "% came back probable and " +
          cur.explained_pct + "% explained. The survey is explicit that a report of \u201cunknown\u201d " +
          "does not imply alien visitation."],
-        ["Pilot reports, 2023", "17",
-         "Occurrences pilots filed into Transport Canada's CADORS database that could be considered UAPs. " +
-         "CTV's count, cited in the Sky Canada report."]
+        ["Pilot-reported, all of CADORS", "0.08%",
+         "The Sky Canada Project report's figure for the share of everything pilots file to Transport " +
+         "Canada's CADORS database that could be considered UAPs. It is a ratio, not a count: the report " +
+         "gives no number of UAP incidents in CADORS."]
       ].map(function (c) {
         return '<article class="card"><div class="readout-label">' + esc(c[0]) + "</div>" +
-          '<div class="figure" style="font-size:44px;margin-top:8px">' + esc(c[1]) + "</div>" +
-          '<p style="margin-top:10px">' + c[2] + "</p></article>";
+          '<div class="figure readout-num">' + esc(c[1]) + "</div>" +
+          '<p class="figure-cap">' + c[2] + "</p></article>";
       }).join("");
 
       var prov = cur.by_province || {};
@@ -500,6 +620,34 @@
     });
   }
 
+  /* ------------------------------------------------------------ paging */
+  /* One pager for both long lists. There were two copies of this, identical
+     except for the element id and whether it scrolls the list back into view --
+     and one of them elided at pages > 9 while the other did not, so the release
+     list and the archive list started collapsing their page numbers at different
+     lengths. One threshold now.
+     window: how many page numbers either side of the current one to show. */
+  function pager(el, page, pages, onPick) {
+    if (!el) return;
+    if (pages <= 1) { el.innerHTML = ""; return; }
+    var h = '<button class="chip" data-p="' + (page - 1) + '"' +
+            (page === 0 ? " disabled" : "") + ">Prev</button>";
+    for (var i = 0; i < pages; i++) {
+      if (pages > 9 && Math.abs(i - page) > 1 && i !== 0 && i !== pages - 1) {
+        if (Math.abs(i - page) === 2) h += '<span class="chip">\u2026</span>';
+        continue;
+      }
+      h += '<button class="chip' + (i === page ? " chip-a" : "") + '" data-p="' + i + '">' +
+           (i + 1) + "</button>";
+    }
+    h += '<button class="chip" data-p="' + (page + 1) + '"' +
+         (page === pages - 1 ? " disabled" : "") + ">Next</button>";
+    el.innerHTML = h;
+    $$("button", el).forEach(function (b) {
+      b.addEventListener("click", function () { onPick(parseInt(b.dataset.p, 10)); });
+    });
+  }
+
   /* ------------------------------------------------------------ timeline */
   function renderTimeline() {
     var host = $("#tl");
@@ -516,7 +664,8 @@
   }
 
   ready(function () {
-    renderDocs(); renderArchive(); renderCases(); renderMedia();
+    renderDocs(); renderArchive(); renderCases(); renderFeaturedCases();
+    renderTranches(); renderMedia(); renderPodcasts();
     renderEndpoints(); wireCkan(); renderTimeline(); renderSurvey();
   });
 })();

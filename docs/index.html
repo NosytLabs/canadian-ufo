@@ -22,7 +22,7 @@
 <meta name="twitter:description" content="AURORA indexes Canada's federal UAP file: 8,759 pages of declassified records, 1,510 archival descriptions from Library and Archives Canada, eighteen sourced case files, and the live open-data endpoin">
 <meta name="twitter:image" content="https://nosytlabs.github.io/canadian-ufo/assets/og.png">
 <link rel="stylesheet" href="assets/base.css">
-<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="vendor/maplibre/maplibre-gl.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304060c'/%3E%3Ccircle cx='16' cy='16' r='8.5' fill='none' stroke='%235fd4e8' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%235fd4e8'/%3E%3C/svg%3E">
 <script type="application/ld+json">
 {
@@ -86,7 +86,7 @@
           "name": "Has the Canadian government ever confirmed a UFO was alien?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. Canada has never issued a finding that a UAP is of extraterrestrial origin. The most recent federal position is the Report of the Sky Canada Project, published by the Office of the Chief Science Advisor in June 2025, which reviewed how Canada receives and handles UAP reports and made 14 recommendations. The first is to identify a federal department or agency responsible for managing public UAP data. As of this writing that recommendation is not implemented."
+            "text": "No. Canada has never issued a finding that a UAP is of extraterrestrial origin. The most recent federal position is the Report of the Sky Canada Project, published by the Office of the Chief Science Advisor in June 2025, which reviewed how Canada receives and handles UAP reports and made 14 recommendations. The first is to identify a federal department or agency responsible for managing public UAP data. That has not happened: the Chief Science Advisor's own project page , last modified 3 December 2025, still presents the report as the deliverable and names no lead agency."
           }
         },
         {
@@ -102,7 +102,7 @@
           "name": "How many sightings are reported in Canada each year?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The Sky Canada report cites public estimates of 600 to 1,000 UAP reports annually from Canadians. Ufology Research's Canadian UFO Survey recorded 570 reports in 2023 and 1,052 in 2025, with more than 24,000 catalogued since the survey began in 1989. Against that, CTV News counted just 17 pilot-filed CADORS occurrences in 2023 that could be considered UAPs."
+            "text": "The Sky Canada report cites public estimates of 600 to 1,000 UAP reports annually from Canadians. Ufology Research's Canadian UFO Survey recorded 570 reports in 2023 and 1,052 in 2025, with more than 26,000 catalogued since the survey began in 1989. The Sky Canada report says pilot-reported UAPs are about 0.08% of everything filed to CADORS — it gives a ratio, not a count."
           }
         },
         {
@@ -186,7 +186,7 @@
       <div class="readout">
         <div class="panel">
           <div class="readout-label">In the file</div>
-          <div class="stat-pair" style="margin-top:12px">
+          <div class="stat-pair" >
             <div class="stat"><b>8,759</b><span>pages, federal FOIA releases</span></div>
             <div class="stat"><b>1,510</b><span>archival descriptions indexed</span></div>
             <div class="stat"><b>4</b><span>origin departments, 1947–1980s</span></div>
@@ -281,17 +281,25 @@
         </p>
       </div>
     </div>
+    <div class="map-warn" id="map-warn" role="status" aria-live="polite"></div>
     <div class="map-shell">
       <div id="map" role="application" aria-label="Map of Canadian UAP case locations"></div>
       <div class="map-side">
-        <div class="panel" style="padding:14px 15px;background:var(--glass-strong);border:1px solid var(--line);border-radius:14px">
-          <div class="readout-label" style="margin-bottom:9px">Case files</div>
-          <ul class="map-list" id="map-list" role="group" aria-label="Case list"></ul>
+        <div class="map-panel">
+          <div class="readout-label" >Case files &middot; 18 &middot; oldest first</div>
+          <div class="map-scroll">
+            <ul class="map-list" id="map-list" role="group" aria-label="Case list"></ul>
+          </div>
         </div>
       </div>
-      <div class="map-hint" id="map-note">Canada · Natural Earth boundaries · scroll to zoom</div>
+      <div class="map-hint" id="map-note">Boundaries: Natural Resources Canada CanVec · basemap: OpenFreeMap (OpenStreetMap)</div>
+      <!-- Typed here as well as read from data/canada.json by map.js, so the credit
+           survives with JavaScript off. generate_pages.py asserts this string
+           against CANVEC_CREDIT, because the two copies used to drift: one page
+           still credited a CARTO basemap that had been replaced with OpenFreeMap,
+           in the line directly below one that named it correctly. -->
     </div>
-    <ul class="chips" id="map-legend" style="list-style:none;margin:16px 0 0;padding:0"></ul>
+    <ul class="chips" id="map-legend"></ul>
   </section>
 
   <!-- ======================================================== releases -->
@@ -299,32 +307,16 @@
     <div class="sec-head">
       <div class="sec-num">03</div>
       <div class="sec-head-col">
-        <h2 class="sec-title">The releases, as a working index</h2>
-        <p class="sec-dek">Five tranches of records, searchable by keyword, record group and release. Every
-          PDF links to the file itself; the database cards link to the live source.</p>
+        <h2 class="sec-title">Five tranches, forty records</h2>
+        <p class="sec-dek">Everything here comes out of one of these five releases. Each PDF volume links
+          to the file itself; the database cards link to the live source.
+          <a href="releases.html">Search all forty records &rarr;</a></p>
       </div>
     </div>
-
-    <div class="filters">
-      <label class="search">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="doc-search" type="search" placeholder="Search titles, agencies, years…" aria-label="Search the release index">
-      </label>
-      <div class="seg" id="doc-rel-filters" role="group" aria-label="Filter by release">
-        <button data-rel="all" aria-pressed="true">All</button>
-        <button data-rel="01" aria-pressed="false">01 Index</button>
-        <button data-rel="02" aria-pressed="false">02 FOIA</button>
-        <button data-rel="03" aria-pressed="false">03 CIRVIS</button>
-        <button data-rel="04" aria-pressed="false">04 Sky Canada</button>
-        <button data-rel="05" aria-pressed="false">05 Live data</button>
-      </div>
-      <select id="doc-prov" class="chip select-chip" aria-label="Filter by record group">
-        <option value="all">All record groups</option>
-      </select>
-      <span class="count-note" id="doc-count" aria-live="polite">—</span>
-    </div>
-    <div class="doc-grid" id="doc-grid"><p class="spinner">Loading the release index…</p></div>
-    <div class="filters" id="doc-pager" style="margin-top:22px"></div>
+    <div id="tranche-grid" aria-live="polite"><p class="spinner">Loading the release index…</p></div>
+    <noscript><div class="noscript-note"><p><b>This section is assembled in the browser.</b> The same five
+      releases are described in <a href="releases.html">the release page</a> and in
+      <code>data/releases.json</code>.</p></div></noscript>
   </section>
 
   <!-- ======================================================= cases peek -->
@@ -332,12 +324,15 @@
     <div class="sec-head">
       <div class="sec-num">04</div>
       <div class="sec-head-col">
-        <h2 class="sec-title">Case files</h2>
-        <p class="sec-dek">Eighteen cases, graded by how well they are sourced, not by how strange they sound. Each opens its own page.</p>
+        <h2 class="sec-title">The cases that rest on a record</h2>
+        <p class="sec-dek">Five of the eighteen case files are graded <em>archival or official record</em> —
+          the sighting is documented in the file itself, not just reported. The other thirteen are on
+          <a href="case.html">the case index</a>, each labelled with how thin its sourcing is.</p>
       </div>
     </div>
-    <div class="grid g-3" id="case-grid" aria-live="polite"><p class="spinner">Loading case files…</p></div>
-    <noscript><div class="noscript-note"><p><b>This section is assembled in the browser.</b> The same records are in the site’s data files — <a href="case.html">the case index</a> or <code>data/cases.json</code> — so nothing is missing, but nothing is pre-rendered either.</p></div></noscript>
+    <div class="grid g-3" id="case-featured" aria-live="polite"><p class="spinner">Loading case files…</p></div>
+    <noscript><div class="noscript-note"><p><b>This section is assembled in the browser.</b> All eighteen
+      cases are in <a href="case.html">the case index</a> and in <code>data/cases.json</code>.</p></div></noscript>
   </section>
 
   <!-- ======================================================== timeline -->
@@ -370,7 +365,10 @@
           most recent federal position is the Report of the Sky Canada Project, published by the Office of the
           Chief Science Advisor in June 2025, which reviewed how Canada receives and handles UAP reports and
           made 14 recommendations. The first is to identify a federal department or agency responsible for
-          managing public UAP data. As of this writing that recommendation is not implemented.</p></div>
+          managing public UAP data. That has not happened: the Chief Science Advisor's own
+          <a href="https://science.gc.ca/site/science/en/office-chief-science-advisor/sky-canada-project" target="_blank" rel="noopener">project page</a>,
+          last modified 3 December 2025, still presents the report as the deliverable and names no lead
+          agency.</p></div>
       </details>
       <details>
         <summary>Where do I report a UFO sighting in Canada?</summary>
@@ -386,8 +384,9 @@
         <summary>How many sightings are reported in Canada each year?</summary>
         <div class="a"><p>The Sky Canada report cites public estimates of 600 to 1,000 UAP reports annually
           from Canadians. Ufology Research's Canadian UFO Survey recorded 570 reports in 2023 and 1,052 in
-          2025, with more than 24,000 catalogued since the survey began in 1989. Against that, CTV News counted
-          just 17 pilot-filed CADORS occurrences in 2023 that could be considered UAPs.</p></div>
+          2025, with more than 26,000 catalogued since the survey began in 1989. The Sky Canada report says
+          pilot-reported UAPs are about 0.08% of everything filed to CADORS — it gives a ratio, not a
+          count.</p></div>
       </details>
       <details>
         <summary>Are the Canadian UAP records public?</summary>
@@ -433,15 +432,18 @@
          this markup as well as shipped in the JSON, and the JSON kept an older,
          wrong copy long after the prose was corrected. -->
     <div class="grid g-4" id="survey-cards" aria-live="polite"><p class="spinner">Loading the survey series…</p></div>
-    <div class="stat-pair" id="survey-stats" style="margin-top:16px"></div>
-    <noscript><div class="noscript-note"><p><b>These figures need JavaScript.</b> They are in
-        <code>data/survey.json</code> — the 2025 edition recorded 1,052 reports, 3.42% of them unexplained
-        against a 10.22% average over the preceding 35 years, and 46.29% returned as insufficient evidence.
-        The record for the series is 1,982 reports in 2012.</p></div></noscript>
-    <p class="prose" style="margin-top:22px">
+    <div class="stat-pair survey-stats" id="survey-stats"></div>
+    <!-- The noscript fallback is written by generate_pages.py from survey.json.
+         It used to be typed in by hand here, and carried two figures the source
+         document does not contain: 46.29%, where the survey says "about 46 per
+         cent", and a count of seventeen pilot reports, which the Sky Canada
+         Project report does not state at all. Rendered instead of typed. -->
+    <noscript><div class="noscript-note" id="survey-noscript"><p><b>These figures need JavaScript.</b> They are in <code>data/survey.json</code> — the 2025 edition recorded 1,052 reports, 3.42% of them unexplained against a 10.22% average over the preceding 35 years, and about 46% returned as insufficient information. The record for the series is 1,982 reports in 2012.</p></div></noscript>
+    <p class="prose" >
       Read the civilian and official series together and the shape of the problem is clear. Observers file over
-      a thousand reports a year; the aviation channel recorded seventeen. Both numbers are true, and the gap
-      between them is a reporting-system problem rather than a question about the sky.
+      a thousand reports a year; aviation pilots report unidentified objects in about 0.08% of the occurrences
+      they file. Both numbers are true, and the gap between them is a reporting-system problem rather than a
+      question about the sky.
       <a href="data.html">Read the survey and the endpoints</a>.
     </p>
   </section>
@@ -515,7 +517,7 @@
 
 </div>
 <script defer src="assets/core.js"></script>
-<script defer src="vendor/leaflet/leaflet.js"></script>
+<script defer src="vendor/maplibre/maplibre-gl.js"></script>
 <script defer src="assets/aurora.js"></script>
 <script defer src="assets/map.js"></script>
 </body>

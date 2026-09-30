@@ -57,16 +57,17 @@
 </header>
 
 <main id="main">
-  <section class="hero" style="padding-bottom:8px">
+  <section class="hero hero-tight">
     <div class="hero-inner hero-1col">
       <div>
         <p class="kicker">Open data · live endpoints · access to information</p>
-        <h1 style="font-size:clamp(36px,6vw,70px)">Get the records yourself</h1>
-        <p class="hero-lede" style="max-width:76ch">
-          Everything AURORA shows is reachable from a public endpoint or a public reading room. The
-          endpoints below were checked before they were listed. Some of them will return nothing. That is a
-          result, not a failure, and the Sky Canada report's first recommendation exists precisely because
-          Canada never built a dataset.
+        <h1 class="hero-h1-md">Get the records yourself</h1>
+        <p class="hero-lede">
+          Everything AURORA shows is reachable from a public endpoint or a public reading room. Some of
+          those endpoints will return nothing when you use them, which is a finding rather than a fault and
+          is why the Sky Canada report's first recommendation exists: Canada never built a dataset. Every
+          external link on this site — these endpoints included — is re-checked by
+          <code>09-scripts/check_links.py</code> on every build, and the build fails on a dead one.
         </p>
       </div>
     </div>
@@ -77,19 +78,28 @@
       <div class="sec-num">01</div>
       <div class="sec-head-col">
         <h2 class="sec-title">Query the federal open catalogue, live</h2>
-        <p class="sec-dek">This runs in your browser against open.canada.ca's CKAN API. Try <code>UFO</code>,
-          <code>UAP</code>, <code>CADORS</code>, or anything else.</p>
+        <p class="sec-dek">This runs in your browser against open.canada.ca's CKAN API. It returns nothing
+          for <code>UFO</code>, <code>UAP</code>, <code>unidentified aerial</code> or <code>CADORS</code>,
+          and that is the result. Try <code>aerial phenomenon</code> or <code>aviation occurrence</code> for
+          what the catalogue does hold. Your term is sent to open.canada.ca in the query string, not to
+          this site.</p>
       </div>
     </div>
     <div class="card">
-      <form id="ckan-form" class="filters" style="margin-bottom:18px">
+      <form id="ckan-form" class="filters mb-4">
         <label class="search">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input id="ckan-q" type="search" value="UFO" aria-label="Search term for the open data catalogue">
+          <input id="ckan-q" type="search" value="aerial phenomenon" aria-label="Search term for the open data catalogue">
         </label>
         <button class="btn btn-primary" type="submit">Search open.canada.ca</button>
       </form>
-      <div id="ckan-out"><p class="spinner">Querying…</p></div>
+      <!-- No request is made until the form is submitted, on purpose: a page view
+           should not send the reader's attention, or an outbound request, to a
+           third party they did not ask about. This pane used to ship with a
+           "Querying…" spinner, which sat there permanently and implied a search
+           that had already run and failed. -->
+      <div id="ckan-out"><p class="note">The form is pre-filled with a term that returns a result. Press
+        Search to query the Government of Canada's open catalogue.</p></div>
     </div>
   </section>
 
@@ -97,8 +107,12 @@
     <div class="sec-head">
       <div class="sec-num">02</div>
       <div class="sec-head-col">
-        <h2 class="sec-title">Verified endpoints</h2>
-        <p class="sec-dek">The working list. Every one of these returned a 200 when this page was built.</p>
+        <h2 class="sec-title">Endpoints that answer</h2>
+        <p class="sec-dek">The working list. Every entry was fetched before it was published here. Most
+          return a live response to any client; three are worth knowing about in advance — two
+          <code>canada.ca</code> pages stall automated requests while serving browsers perfectly well, and
+          NUFORC blocks anything that is not a person clicking a link. Those three are marked on the list,
+          and all three work in a browser.</p>
       </div>
     </div>
     <ul class="linklist" id="ep-list" aria-live="polite"><li><p class="spinner">Loading endpoints…</p></li></ul>
@@ -167,13 +181,13 @@
             States, GEIPAN in France, and SEFAA in Chile.</li>
           <li><strong>Cooperation in research and communication</strong> with those same partners.</li>
         </ul>
-        <p style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <p class="mt-4 chip-row">
           <a class="btn" href="https://science.gc.ca/site/science/en/office-chief-science-advisor/sky-canada-project/management-public-reporting-unidentified-aerial-phenomena-canada" target="_blank" rel="noopener">Read it on science.gc.ca</a>
           <a class="btn" href="https://www.science.gc.ca/site/science/sites/default/files/documents/sky-canada-report.pdf" target="_blank" rel="noopener">The 59-page PDF</a>
         </p>
       </div>
     </div>
-    <div class="grid g-2" style="margin-top:16px">
+    <div class="grid g-2" >
       <div class="stat"><b>Five gaps</b><span>the report names, in its own words: no cohesive and standardized
         reporting and follow-up system; no public engagement platform; reports not analysed unless they pose a
         safety or security risk; too little scientific involvement; and insufficient science literacy, which
@@ -223,7 +237,11 @@
         <h3>Target 3 — the modern reporting channel</h3>
         <p>There is no Canadian equivalent of the US all-domain anomaly office. Until the first Sky Canada
           recommendation is implemented, the only federal intake for a pilot or crew sighting is Transport
-          Canada's CADORS occurrence report, and no analysis of what lands there has been published.</p>
+          Canada's CADORS occurrence report. The bulk occurrence data is published
+          <a href="https://open.canada.ca/data/en/dataset/a348c1d1-2392-4595-b5e2-c6a244a7e87f" target="_blank" rel="noopener">as open data</a>,
+          and news outlets have pulled UAP-shaped rows out of it, but there is no federal body that reads
+          CADORS looking for unidentified objects, and occurrence type has to be read out of the rows by
+          hand.</p>
         <div class="chips meta"><span class="chip">CADORS</span><span class="chip">no lead agency</span></div>
         <div class="meta"><a class="btn" href="https://tc.canada.ca/en/aviation/aviation-accidents-investigations/emergencies-incident-reporting" target="_blank" rel="noopener">Transport Canada &mdash; report an occurrence</a></div>
       </article>
@@ -257,8 +275,10 @@
       <li><span class="bullet"></span><div><a href="data/endpoints.json">data/endpoints.json</a>
         <div class="desc">The verified endpoint list, as data rather than prose.</div></div></li>
       <li><span class="bullet"></span><div><a href="data/canada.json">data/canada.json</a>
-        <div class="desc">Province and territory boundaries from Natural Earth (public domain), simplified for
-          the web. Use it to plot your own records.</div></div></li>
+        <div class="desc">Province and territory boundaries from Natural Resources Canada's CanVec 15 m
+          Administrative theme (Open Government Licence – Canada), with each jurisdiction merged into one
+          feature. This is the government's own cartography, not a third-party approximation — use it to plot
+          your own records.</div></div></li>
       <li><span class="bullet"></span><div><a href="llms.txt">llms.txt</a>
         <div class="desc">A plain-text summary of the archive, its key facts and every page, written for
           language models and answer engines.</div></div></li>

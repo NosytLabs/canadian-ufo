@@ -47,14 +47,29 @@ the live open-data endpoints that serve the record today.
 - /data/lac.json : 1,510 archival descriptions with source URLs
 - /data/cases.json : 18 case files with coordinates and source links
 - /data/timeline.json : the record year by year, 1947 to now
-- /data/media.json, /data/podcasts.json : video and audio, with links to the case each documents
+- /data/media.json : video items, each with the case it documents
+- /data/podcasts.json : LAC Discover podcast episodes. [{id, title, len, size, published, org,
+  case, note, url}]. media.html renders both sections from these two files.
 - /data/endpoints.json : the verified government endpoint list, as data rather than prose
 - /data/survey.json : the Canadian UFO Survey series. {"meta": {since, catalogued_total, series_url},
   "years": [{year, reports, unexplained_pct, ...}]}. This is the single source for every survey
   figure on the site; the 2025 row carries the full breakdown, the 35-year average and the
   provincial counts. The series record is 1,982 reports (2012) -- 1,052 in 2025 is the biggest
   year since 2020, not the largest on record.
-- /data/canada.json : Natural Earth province boundaries (public domain)
+- /data/canada.json : province and territory boundaries, Natural Resources Canada CanVec 15 m
+  Administrative theme (Open Government Licence - Canada). One merged feature per jurisdiction, 13
+  in all. Alongside "features" it carries "attribution" (the licence), "source" (the FTP URL), plus
+  "credit" and "basemap" -- the two short strings map.js writes into the map's credit line, so the
+  credit is data rather than markup. The basemap itself is OpenFreeMap and is not in this file.
+- /data/lac_stats.json : measured figures about the 1,510 rows in lac.json, written by the build
+  from the same rows it serves, and the file generate_pages.py asserts archive.html's prose
+  against. "single_group_query_caps" is how many rows ONE record-group query returns -- LAC browse
+  stops at 50 and its sk parameter repeats the last page, so these are page caps, not totals, and
+  the four sum to the 206 the page quotes. "by_group" is the union of all 59 queries and is the
+  real per-group total. "by_route" records which query surfaced each row. "titles" and
+  "distinct_titles" exist because doc_title is a series title, not a description: 7 distinct values
+  across 1,510 rows. "shag_harbour_paper_trail" is the 22 Barrington Passage rows, which are only
+  reachable by adding a province to a record-group query.
 
 ## Conventions
 

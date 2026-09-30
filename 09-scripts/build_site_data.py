@@ -30,11 +30,22 @@ def w(path, obj):
 # run from ~/canadian-ufo-research). Serving site/ on its own will 404 the PDFs.
 
 # ---------------------------------------------------------------- LAC index
-# lac_full.json is the wide index from 09-scripts/scrape_lac_matrix.py: the union
-# of 59 distinct queries against the LAC browse interface. lac_records.json is the
-# older, single-query-per-group scrape and is only a fallback.
-_full = os.path.join(ROOT, "data", "lac_full.json")
-_lac_path = _full if os.path.exists(_full) else os.path.join(ROOT, "data", "lac_records.json")
+# data/lac_full.json is the wide index from 09-scripts/scrape_lac_matrix.py: the
+# union of 59 distinct queries against the LAC browse interface, 1,510 rows.
+#
+# There is deliberately no fallback to an older, smaller scrape. It used to fall
+# back to data/lac_records.json -- 207 rows, one query per record group, which is
+# what LAC's 50-row-per-query cap returns. A missing real index therefore used to
+# publish 207 records as if they were the collection, and nothing printed a
+# warning. 207 is a page cap, not a count, and the difference is the whole point
+# of the site. Refuse to build instead.
+_lac_path = os.path.join(ROOT, "data", "lac_full.json")
+if not os.path.exists(_lac_path):
+    raise SystemExit(
+        "build_site_data: %s is missing. Run 09-scripts/scrape_lac_matrix.py to\n"
+        "rebuild it -- 59 queries, union of the results. There is no fallback to a\n"
+        "smaller scrape: publishing one would understate the collection silently."
+        % os.path.relpath(_lac_path, ROOT))
 lac = json.load(open(_lac_path))
 print("LAC index source:", os.path.basename(_lac_path), "->", len(lac), "descriptions")
 for r in lac:
@@ -44,6 +55,83 @@ for r in lac:
     r["abbr"] = FUND.get(r["record_group"], (isn, "OTHER"))[1]
     r["num"] = int(isn) if str(isn).isdigit() else 0
 w(os.path.join(DATA, "lac.json"), lac)
+
+# ------------------------------------------------- lac_stats.json
+# One file, one meaning. This used to be two files in data/ written by the
+# scrapers -- lac_summary.json and lac_counts.json -- and generate_pages.py
+# asserted archive.html's prose against the second one while the first said
+# something different. The summary drifted out of date (it still reported
+# with_title: 199 from before the second title pass) and the two were easy to
+# read as competing totals for the same question. Both are gone; the numbers
+# the prose depends on are computed here, from the rows actually being served.
+#
+# The distinction that caused the confusion, stated once:
+#   single_group_query_caps -- how many rows ONE record-group query returns.
+#     LAC browse stops at 50 per query and its sk paging repeats the last page,
+#     so these are page caps, not totals. They sum to 206, which is the number
+#     archive.html quotes as the size of a single sweep.
+#   by_group -- the union of all 59 queries, so the real per-group totals.
+def _tally(rows, key):
+    out = {}
+    for r in rows:
+        out[r.get(key) or "Unattributed"] = out.get(r.get(key) or "Unattributed", 0) + 1
+    return out
+
+# Measured, not derived: the rows a single record-group query returns from LAC's
+# browse interface, which stops at 50 rows and whose sk parameter repeats the
+# last page rather than offsetting. These are page caps, not totals, and they are
+# here so the prose assertion in generate_pages.py has one place to read and the
+# number can never be quietly treated as a count of the collection.
+#
+# They are NOT derived from scrape_lac_full.py's output even though that script
+# makes the same single-query sweep, because that script is the narrow tool: it
+# would write its ~207 rows over the real index if it ran unguarded, and it no
+# longer does. scrape_lac_matrix.py is what produces the 1,510 rows published
+# as lac.json; these four numbers describe the shape of LAC's interface, not
+# anything that script counts.
+SINGLE_GROUP_QUERY_CAPS = {"Department of National Defence": 51,
+                           "Department of Transport": 54,
+                           "National Research Council": 50,
+                           "Royal Canadian Mounted Police": 51}
+
+_titles = _tally([r for r in lac if r.get("doc_title")], "doc_title")
+# The Shag Harbour paper trail. Matching on the place name alone catches four
+# other Barrington rows -- one dated Nov. 1970 and three with no date -- so the
+# set is pinned to the sighting date the cards on archive.html actually claim.
+_shag = [r for r in lac if r.get("location") == "Barrington Passage, NS"
+         and r.get("sighting_date") == "10/5/1967"]
+stats = {
+    "total": len(lac),
+    "single_group_query_caps": SINGLE_GROUP_QUERY_CAPS,
+    "by_group": _tally(lac, "record_group"),
+    "by_route": _tally(lac, "via"),
+    "with_doc_date": sum(1 for r in lac if not str(r.get("doc_date", "[")).startswith("[")),
+    "with_location": sum(1 for r in lac if not str(r.get("location", "[")).startswith("[")),
+    "with_sighting_date": sum(1 for r in lac if not str(r.get("sighting_date", "[")).startswith("[")),
+    "distinct_titles": len(_titles),
+    "titles": _titles,
+    "shag_harbour_paper_trail": {
+        "location": "Barrington Passage, NS",
+        "sighting_date": "10/5/1967",
+        "isn": "4733",
+        "record_group": "National Research Council",
+        "count": len(_shag),
+        "via": "province + record group",
+        # LAC writes dates M/D/YYYY, which does not sort as text: "12/5/1967"
+        # sorts before "12/19/1967". Sort on the tuple so the range is real.
+        "doc_dates": sorted({r["doc_date"] for r in _shag},
+                            key=lambda d: tuple(int(x) for x in d.split("/"))),
+        "note": ("None of these are reachable by the record-group query alone -- they only "
+                 "surface once a province is added. The record-group route returns 49 NRC rows "
+                 "with no location cited at all. A substring match on the place name returns 26 "
+                 "rows; four of them are other Barrington reports, one dated Nov. 1970."),
+    },
+    "note": ("doc_title is a series title, not a description of the individual document: "
+             "the 1,510 rows carry %d distinct values between them, because the holdings are "
+             "scanned images catalogued at series level. Coverage is the union of 59 distinct "
+             "queries against an interface that caps each one at 50 rows." % len(_titles)),
+}
+w(os.path.join(DATA, "lac_stats.json"), stats)
 
 # ------------------------------------------------- declassified PDF volumes
 docs = []
@@ -151,7 +239,12 @@ official = [
         "source": "Transport Canada",
         "pages": None, "pageRange": [0, 0],
         "date": "current", "location": "Canada", "type": "database", "release": "05",
-        "external": "https://tc.canada.ca/en/civil-aviation/canadian-aviation-safety-investigations-reporting/cadors",
+        # The old link was tc.canada.ca/en/civil-aviation/
+        # canadian-aviation-safety-investigations-reporting/cadors, which now
+        # 404s. This is the search interface CADORS is actually queried through.
+        # The bulk occurrence data is a separate, downloadable dataset listed on
+        # the Open Government Portal.
+        "external": "https://wwwapps.tc.gc.ca/saf-sec-sur/2/cadors-screaq/m.aspx?lang=eng",
         "thumb": None,
     },
     {
@@ -161,7 +254,11 @@ official = [
         "source": "Government of Canada Open Data",
         "pages": None, "pageRange": [0, 0],
         "date": "current", "location": "Canada", "type": "api", "release": "05",
-        "external": "https://open.canada.ca/data/en/dataset?q=UFO",
+        # This was open.canada.ca/data/en/dataset?q=UFO, a 400. The portal's
+        # human search page rejects deep links outright -- every query parameter
+        # tried returns "Unknown search syntax" -- so it is not a usable URL to
+        # publish. The CKAN API behind it takes q= and answers.
+        "external": "https://open.canada.ca/data/api/3/action/package_search?q=UFO",
         "thumb": None,
     },
     {

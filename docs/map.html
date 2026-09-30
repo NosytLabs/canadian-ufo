@@ -21,7 +21,7 @@
 <meta name="twitter:title" content="Case map — Canadian UAP incidents by province and territory — AURORA">
 <meta name="twitter:description" content="An interactive map of eighteen Canadian UAP case locations across all provinces and territories, from the 1967 Shag Harbour and Falcon Lake incidents to the 2023 NORAD intercept over the Yukon, with c">
 <meta name="twitter:image" content="https://nosytlabs.github.io/canadian-ufo/assets/og.png">
-<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="vendor/maplibre/maplibre-gl.css">
 <link rel="stylesheet" href="assets/base.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304060c'/%3E%3Ccircle cx='16' cy='16' r='8.5' fill='none' stroke='%235fd4e8' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%235fd4e8'/%3E%3C/svg%3E">
 <script type="application/ld+json">
@@ -58,36 +58,44 @@
 </header>
 
 <main id="main">
-  <section class="hero" style="padding-bottom:8px">
+  <section class="hero hero-tight">
     <div class="hero-inner hero-1col">
       <div>
         <p class="kicker">Case map · 18 locations · 9 provinces and territories</p>
-        <h1 style="font-size:clamp(36px,6vw,70px)">Where the file has a place</h1>
-        <p class="hero-lede" style="max-width:76ch">
+        <h1 class="hero-h1-md">Where the file has a place</h1>
+        <p class="hero-lede">
           Eighteen cases with coordinates. Colour encodes sourcing quality, not how strange the event was: cyan is a
-          government or archival record, green is mainstream reporting with named sources, amber is thin sourcing.
-          Click a marker to open its case file.
+          government or archival record, blue is mainstream reporting with named sources, amber is thin sourcing.
+          Click a marker for the case; the list beside the map does the same without a mouse.
         </p>
       </div>
     </div>
   </section>
 
   <section>
+    <div class="map-warn" id="map-warn" role="status" aria-live="polite"></div>
     <div class="map-shell">
       <div id="map" role="application" aria-label="Interactive map of Canadian UAP case locations"></div>
       <div class="map-side">
-        <div style="padding:14px 15px;background:var(--glass-strong);border:1px solid var(--line);border-radius:14px;backdrop-filter:blur(14px)">
-          <div class="readout-label" style="margin-bottom:9px">Case files · oldest first</div>
-          <ul class="map-list" id="map-list" role="group" aria-label="Case list"></ul>
+        <div class="map-panel">
+          <div class="readout-label" >Case files &middot; 18 &middot; oldest first</div>
+          <div class="map-scroll">
+            <ul class="map-list" id="map-list" role="group" aria-label="Case list"></ul>
+          </div>
         </div>
       </div>
-      <div class="map-hint" id="map-note">Canada · Natural Earth boundaries · scroll to zoom · drag to pan</div>
+      <div class="map-hint" id="map-note">Boundaries: Natural Resources Canada CanVec · basemap: OpenFreeMap (OpenStreetMap)</div>
+      <!-- Typed here as well as read from data/canada.json by map.js, so the credit
+           survives with JavaScript off. generate_pages.py asserts this string
+           against CANVEC_CREDIT, because the two copies used to drift: one page
+           still credited a CARTO basemap that had been replaced with OpenFreeMap,
+           in the line directly below one that named it correctly. -->
     </div>
 
-    <div class="grid g-2" style="margin-top:24px;align-items:start">
+    <div class="grid g-2" >
       <div class="card">
         <h3>What the geography shows</h3>
-        <ul class="linklist" style="margin-top:14px">
+        <ul class="linklist" >
           <li><span class="bullet"></span><div><strong>The Maritimes dominate the famous cases.</strong>
             Nova Scotia holds two of the eighteen, and the two most-documented in the country. New Brunswick holds four, mostly modern witness reports rather than official files.</div></li>
           <li><span class="bullet"></span><div><strong>Newfoundland and Labrador is the aviation cluster.</strong>
@@ -102,12 +110,12 @@
       </div>
       <div class="card">
         <h3>How to read the colours</h3>
-        <ul id="map-legend" style="list-style:none;margin:14px 0 0;padding:0"></ul>
-        <p style="margin-top:16px;font-size:13.4px;color:var(--muted)">
+        <ul id="map-legend" class="flush mt-3"></ul>
+        <p class="note mt-4">
           A marker is a place, not a proof. Each circle is a case file with a source list; the grade tells you
           how hard you will have to work to stand behind it.
         </p>
-        <p style="margin-top:12px">
+        <p class="mt-2">
           <a class="btn" href="case.html">All case files</a>
         </p>
       </div>
@@ -124,7 +132,7 @@
     </div>
     <div class="table-wrap">
       <table id="arc-table-map">
-        <caption class="sr">Canadian UAP case files with dates, locations and sourcing grades</caption>
+        <caption class="sr-only">Canadian UAP case files with dates, locations and sourcing grades</caption>
         <thead>
           <tr>
             <th scope="col">Date</th><th scope="col">Case</th><th scope="col">Province / territory</th>
@@ -134,22 +142,22 @@
         <tbody>
           <tr><td>10 February 1951</td><td><a href="case-gander-1951.html">Gander</a></td><td>NL</td><td>Atlantic</td><td>48.95, −54.60</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
           <tr><td>20 May 1967</td><td><a href="case-falcon-lake.html">Falcon Lake</a></td><td>MB</td><td>Prairies / North</td><td>50.10, −96.55</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
-          <tr><td>June-November 1967</td><td><a href="case-falcon-lake-wave-1967.html">Falcon Lake region, 1967 wave</a></td><td>MB</td><td>Prairies / North</td><td>50.75, −97.10</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
+          <tr><td>June-November 1967</td><td><a href="case-falcon-lake-wave-1967.html">Falcon Lake region, 1967 wave</a></td><td>MB</td><td>Prairies / North</td><td>50.75, −97.10</td><td><span class="chip chip">Mainstream reporting, named sources</span></td></tr>
           <tr><td>4 October 1967</td><td><a href="case-shag-harbour.html">Shag Harbour</a></td><td>NS</td><td>Atlantic</td><td>43.85, −65.50</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
-          <tr><td>4 October 1967</td><td><a href="case-nova-scotia-wave-1967.html">The Night of the UFOs</a></td><td>NS</td><td>Atlantic</td><td>44.37, −64.31</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
+          <tr><td>4 October 1967</td><td><a href="case-nova-scotia-wave-1967.html">The Night of the UFOs</a></td><td>NS</td><td>Atlantic</td><td>44.37, −64.31</td><td><span class="chip chip">Mainstream reporting, named sources</span></td></tr>
           <tr><td>1 January 1969</td><td><a href="case-prince-george-1969.html">Prince George</a></td><td>BC</td><td>West</td><td>53.92, −122.75</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
           <tr><td>10-11 October 1974</td><td><a href="case-gander-1974.html">Gander</a></td><td>NL</td><td>Atlantic</td><td>48.95, −54.60</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
           <tr><td>26 October 1978</td><td><a href="case-clarenville-1978.html">Clarenville</a></td><td>NL</td><td>Atlantic</td><td>48.16, −55.88</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
-          <tr><td>7 November 1990</td><td><a href="case-montreal-1990.html">Bonaventure Hotel, Montreal</a></td><td>QC</td><td>Quebec</td><td>45.50, −73.57</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
-          <tr><td>11 December 1996</td><td><a href="case-yukon-1996.html">The row of lights</a></td><td>YT</td><td>North</td><td>60.72, −135.05</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
-          <tr><td>14 February 2002</td><td><a href="case-new-brunswick-nuclear-2002.html">New Brunswick protected airspace</a></td><td>NB</td><td>Atlantic</td><td>45.85, −66.75</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
-          <tr><td>19 June 2012</td><td><a href="case-saint-john-2012.html">Saint John</a></td><td>NB</td><td>Atlantic</td><td>45.27, −66.06</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr>
+          <tr><td>7 November 1990</td><td><a href="case-montreal-1990.html">Bonaventure Hotel, Montreal</a></td><td>QC</td><td>Quebec</td><td>45.50, −73.57</td><td><span class="chip chip">Mainstream reporting, named sources</span></td></tr>
+          <tr><td>11 December 1996</td><td><a href="case-yukon-1996.html">The row of lights</a></td><td>YT</td><td>North</td><td>60.72, −135.05</td><td><span class="chip chip">Mainstream reporting, named sources</span></td></tr>
+          <tr><td>14 February 2002</td><td><a href="case-new-brunswick-nuclear-2002.html">New Brunswick protected airspace</a></td><td>NB</td><td>Atlantic</td><td>45.85, −66.75</td><td><span class="chip chip">Mainstream reporting, named sources</span></td></tr>
+          <tr><td>19 June 2012</td><td><a href="case-saint-john-2012.html">Saint John</a></td><td>NB</td><td>Atlantic</td><td>45.27, −66.06</td><td><span class="chip chip">Mainstream reporting, named sources</span></td></tr>
           <tr><td>31 March 2013</td><td><a href="case-stephenville-2013.html">Stephenville</a></td><td>NL</td><td>Atlantic</td><td>48.55, −58.75</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
           <tr><td>4 June 2014</td><td><a href="case-kensington-pei-2014.html">Kensington</a></td><td>PE</td><td>Atlantic</td><td>46.57, −63.57</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
           <tr><td>29 December 2014</td><td><a href="case-moncton-2014.html">Moncton</a></td><td>NB</td><td>Atlantic</td><td>46.09, −64.77</td><td><span class="chip chip-amb">Thin sourcing — verify before citing</span></td></tr>
           <tr><td>24 November 2018</td><td><a href="case-baffin-island-2018.html">Baffin Island</a></td><td>NU</td><td>North</td><td>66.50, −61.25</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
           <tr><td>11 February 2023</td><td><a href="case-yukon-2023.html">Yukon shootdown</a></td><td>YT</td><td>North</td><td>63.50, −136.00</td><td><span class="chip chip-a">Archival or official record</span></td></tr>
-          <tr><td>26 July 2023</td><td><a href="case-fredericton-2023.html">Fredericton</a></td><td>NB</td><td>Atlantic</td><td>45.95, −66.65</td><td><span class="chip chip">Mainstream reporting with named sources</span></td></tr></tbody>
+          <tr><td>26 July 2023</td><td><a href="case-fredericton-2023.html">Fredericton</a></td><td>NB</td><td>Atlantic</td><td>45.95, −66.65</td><td><span class="chip chip">Mainstream reporting, named sources</span></td></tr></tbody>
       </table>
     </div>
   </section>
@@ -168,16 +176,16 @@
       <h2>Machine-readable</h2>
       <ul>
         <li><a href="data/cases.json">cases.json</a></li>
-        <li><a href="data/canada.json">canada.json (Natural Earth, public domain)</a></li>
+        <li><a href="data/canada.json">canada.json (Natural Resources Canada CanVec)</a></li>
         <li><a href="llms.txt">llms.txt</a></li>
       </ul>
     </div>
     <div>
       <h2>Attribution</h2>
       <ul>
-        <li><a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a> (BSD-2)</li>
-        <li><a href="https://www.naturalearthdata.com" target="_blank" rel="noopener">Natural Earth</a> (public domain)</li>
-        <li><a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> basemap</li>
+        <li><a href="https://maplibre.org" target="_blank" rel="noopener">MapLibre GL JS</a> (BSD-3)</li>
+        <li><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> (basemap style and tiles, no key)</li>
+        <li><a href="https://open.canada.ca/data/en/dataset/306e5004-534b-4110-9feb-58e3a5c3fd97" target="_blank" rel="noopener">CanVec</a> (Natural Resources Canada, Open Government Licence)</li>
         <li><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</li>
       </ul>
     </div>
@@ -189,7 +197,7 @@
 </footer>
 </div>
 <script defer src="assets/core.js"></script>
-<script defer src="vendor/leaflet/leaflet.js"></script>
+<script defer src="vendor/maplibre/maplibre-gl.js"></script>
 <script defer src="assets/aurora.js"></script>
 <script defer src="assets/map.js"></script>
 <script>

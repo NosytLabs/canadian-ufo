@@ -17,6 +17,15 @@
 # Scraped HTML cache
 data/lac_html/
 
+# Cross-check scrape output. Read by nothing, kept out of git; ufobc_scrape.py
+# refuses to write a partial year range, so this never silently claims zero.
+data/ufobc_sightings.json
+
+# Downloaded source data for the map build. build_aurora_data.py fetches the
+# CanVec administrative shapefile from ftp.maps.canada.ca on first run and
+# unpacks it here; the published geometry is already in site/data/canada.json.
+09-scripts/.cache/
+
 # Python
 __pycache__/
 *.py[cod]
