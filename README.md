@@ -28,8 +28,10 @@ required — the 1 GB local archive is not referenced by the site.
 
 ## Running it
 
+From the root of your local clone:
+
 ```sh
-cd ~/canadian-ufo-research/site
+cd site
 python3 -m http.server 8811
 # open http://127.0.0.1:8811/
 ```
