@@ -847,7 +847,7 @@ ENDPOINTS = [
      "url": "https://nuforc.org/subndx/?id=lNB",
      "note": "A civilian US reporting centre's index of Canadian cases. Blocks non-browser clients; NB shows 229 entries, NS 257, NL 63, PE 28, MB 270, ON 2,732, QC 476, AB 779."},
     {"name": "Shag Harbour UFO Incident Society - visitor centre", "org": "Shag Harbour UFO Incident Society",
-     "url": "https://www.shagharbourincident.ca/visit.html",
+     "url": "https://www.shagharbourincident.ca/plan-your-visit/",
      "note": "The interpretive centre on Highway 3, and a live annual gathering. Sixty years on, the case is still generating visitors."},
     {"name": "CBC Terms of Use", "org": "CBC / Radio-Canada",
      "url": "https://cbc.radio-canada.ca/en/vision/governance/terms-of-use-digital-services",
