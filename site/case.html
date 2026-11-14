@@ -28,11 +28,22 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "name": "Case files — eighteen Canadian UAP cases, graded by sourcing",
-  "description": "Canadian UAP cases with primary sources, graded by sourcing quality.",
-  "url": "https://nosytlabs.github.io/canadian-ufo/case.html",
-  "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" }
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "Case files — eighteen Canadian UAP cases, graded by sourcing",
+      "description": "Canadian UAP cases with primary sources, graded by sourcing quality.",
+      "url": "https://nosytlabs.github.io/canadian-ufo/case.html",
+      "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "AURORA", "item": "https://nosytlabs.github.io/canadian-ufo/" },
+        { "@type": "ListItem", "position": 2, "name": "Case files", "item": "https://nosytlabs.github.io/canadian-ufo/case.html" }
+      ]
+    }
+  ]
 }
 </script>
 </head>
@@ -67,7 +78,7 @@
         <p class="hero-lede">
           Every case here is graded, and the grade is about the paperwork, not the story.
           <span class="chip chip-a">Archival or official record</span> means a government or archival document
-          is linked. <span class="chip">Mainstream reporting with named sources</span> means the reporting is
+          is linked. <span class="chip">Mainstream reporting, named sources</span> means the reporting is
           solid but the file has not been read directly. <span class="chip chip-amb">Thin sourcing</span> means
           it is here because a marked gap is better than a silent one.
         </p>

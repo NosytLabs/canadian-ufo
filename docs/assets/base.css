@@ -71,10 +71,11 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(68vw 52vh at 8% -6%, rgba(95, 212, 232, 0.17), transparent 62%),
-    radial-gradient(50vw 42vh at 94% 2%, rgba(110, 168, 255, 0.13), transparent 60%),
-    radial-gradient(40vw 36vh at 50% 100%, rgba(95, 212, 232, 0.07), transparent 55%),
-    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 52%, #03050a 100%);
+    radial-gradient(72vw 55vh at 7% -8%,  rgba(95, 212, 232, 0.21), transparent 60%),
+    radial-gradient(55vw 44vh at 96%  1%,  rgba(110, 168, 255, 0.17), transparent 58%),
+    radial-gradient(36vw 26vh at 74%  7%,  rgba(148, 100, 240, 0.09), transparent 50%),
+    radial-gradient(44vw 38vh at 48% 102%, rgba(95, 212, 232, 0.08), transparent 54%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 48%, #02040a 100%);
 }
 
 .shell { position: relative; z-index: 1; }
@@ -146,8 +147,8 @@ body {
   font: 700 clamp(44px, 8vw, 96px)/0.96 var(--sans);
   letter-spacing: -0.04em;
   color: #fff;
-  /* subtle white-to-cyan gradient on headings; matches the brand accent */
-  background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+  /* aurora gradient: white → ice-blue → cyan accent */
+  background: linear-gradient(135deg, #fff 18%, #d6f4fa 48%, var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -194,8 +195,16 @@ body {
 }
 .btn:hover { transform: translateY(-2px); background: rgba(148, 176, 214, 0.15); box-shadow: 0 10px 26px rgba(2, 6, 23, 0.5); }
 .btn:active { transform: translateY(0); }
-.btn-primary { color: var(--accent-ink); border-color: transparent; background: var(--accent); }
-.btn-primary:hover { background: #7ee0f1; box-shadow: 0 12px 28px rgba(95, 212, 232, 0.22); }
+.btn-primary {
+  color: var(--accent-ink); border-color: transparent;
+  background: linear-gradient(135deg, var(--accent) 0%, #3ec8de 100%);
+  box-shadow: 0 4px 14px rgba(95, 212, 232, 0.18);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #7ee0f1 0%, var(--accent) 100%);
+  box-shadow: 0 12px 28px rgba(95, 212, 232, 0.30);
+  transform: translateY(-2px);
+}
 
 /* hero readout panel */
 .readout { display: grid; gap: 12px; }
@@ -251,7 +260,7 @@ section:first-of-type { border-top: 0; }
   border-top: 2px solid var(--accent-line);
   padding-top: 9px;
   text-align: right;
-  text-shadow: 0 0 12px rgba(95, 212, 232, 0.4);
+  text-shadow: 0 0 18px rgba(95, 212, 232, 0.6), 0 0 6px rgba(95, 212, 232, 0.4);
 }
 .sec-head-col { min-width: 0; }
 .sec-title { margin: 0; font: 700 clamp(25px, 3.6vw, 38px)/1.14 var(--sans); letter-spacing: -0.028em; }
@@ -276,16 +285,28 @@ section:first-of-type { border-top: 0; }
   -webkit-backdrop-filter: blur(14px);
   transition: border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
 }
-.card:hover { border-color: var(--accent-line); background: rgba(20, 30, 50, 0.6); box-shadow: 0 20px 44px rgba(2, 6, 23, 0.44), 0 0 0 1px var(--accent-line) inset; }
+/* Top-edge highlight: a 1px gradient at the top gives cards a glassy lift */
+.card::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,0.045) 0px, transparent 48px);
+  z-index: 0;
+}
+.card > * { position: relative; z-index: 1; }
+.card:hover { border-color: var(--accent-line); background: rgba(18, 28, 48, 0.7); box-shadow: 0 20px 48px rgba(2, 6, 23, 0.5), 0 0 0 1px var(--accent-line) inset; }
 .card h3 { margin: 0 0 8px; font: 650 18.5px/1.3 var(--sans); letter-spacing: -0.015em; }
 .card p { margin: 0; color: var(--muted); font-size: 14.4px; }
 .card .meta { margin-top: auto; padding-top: 14px; }
 
 /* Case cards get a coloured left border matching their confidence level.
- * The class is set by aurora.js on the article element (conf-primary etc.). */
+ * The class is set by aurora.js on the article element (conf-primary etc.).
+ * Hover state amplifies the colour signal with a matching glow. */
 article.card.conf-primary  { border-left: 3px solid var(--conf-primary); }
 article.card.conf-reported { border-left: 3px solid var(--conf-reported); }
 article.card.conf-partial  { border-left: 3px solid var(--conf-partial); }
+article.card.conf-primary:hover  { border-color: var(--conf-primary);  box-shadow: 0 20px 48px rgba(2,6,23,0.5), 0 0 0 1px rgba(95,212,232,0.4) inset,  0 0 28px rgba(95,212,232,0.10);  }
+article.card.conf-reported:hover { border-color: var(--conf-reported); box-shadow: 0 20px 48px rgba(2,6,23,0.5), 0 0 0 1px rgba(143,166,247,0.4) inset, 0 0 28px rgba(143,166,247,0.10); }
+article.card.conf-partial:hover  { border-color: var(--conf-partial);  box-shadow: 0 20px 48px rgba(2,6,23,0.5), 0 0 0 1px rgba(245,158,11,0.4) inset,  0 0 28px rgba(245,158,11,0.10);  }
 
 
 /* Chip row on a case card. Was an inline margin on every instance. */
@@ -350,7 +371,9 @@ article.card.conf-partial  { border-left: 3px solid var(--conf-partial); }
 .doc:hover { border-color: var(--accent-line); background: rgba(20, 30, 50, 0.6); }
 .doc-thumb { position: relative; aspect-ratio: 4/3; background: #0a1120; border-bottom: 1px solid var(--line); overflow: hidden; }
 .doc-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top center; filter: contrast(1.06) saturate(0.92); display: block; }
-.doc-thumb .ph { position: absolute; inset: 0; display: grid; place-items: center; font: 600 10.5px/1.5 var(--mono); color: var(--faint); letter-spacing: 0.1em; background: repeating-linear-gradient(45deg, rgba(148,176,214,0.05) 0 8px, transparent 8px 16px); }
+.doc-thumb .ph { position: absolute; inset: 0; display: grid; place-items: center; font: 600 10.5px/1.5 var(--mono); color: var(--faint); letter-spacing: 0.1em;
+  background: repeating-linear-gradient(45deg, rgba(95,212,232,0.04) 0 8px, transparent 8px 16px),
+              radial-gradient(80% 80% at 50% 0%, rgba(95,212,232,0.07), transparent 70%), #060b16; }
 .doc-body { padding: 16px 17px 18px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
 .doc-id { font: 500 10.5px/1 var(--mono); letter-spacing: 0.12em; color: var(--accent); }
 .doc-body h3 { margin: 0; font: 650 15.5px/1.34 var(--sans); letter-spacing: -0.012em; }
@@ -514,7 +537,13 @@ select.chip option { background: var(--bg-1); color: var(--text); }
 
 /* MapLibre. The vendor stylesheet does the layout; these rules restyle its
    chrome to match the rest of the site. There is no tile-pane filter any more:
-   the basemap ships as a real dark vector style, so nothing is inverted. */
+   the basemap ships as a real dark vector style, so nothing is inverted.
+
+   The popup: MapLibre 5.x has no .maplibregl-popup-content-wrapper class — the
+   content container IS .maplibregl-popup-content. The old rules targeted a ghost
+   class so the popup rendered white-on-white (completely unreadable). The tip
+   anchor variants each set their own border-color; every one must be overridden
+   or the arrow stays white against the dark popup background. */
 #map { font-family: var(--sans); }
 .maplibregl-map { font-family: var(--sans); }
 .maplibregl-ctrl-group {
@@ -532,19 +561,51 @@ select.chip option { background: var(--bg-1); color: var(--text); }
   font: 400 10px/1.5 var(--sans) !important;
 }
 .maplibregl-ctrl-attrib a { color: var(--text-soft) !important; }
-.maplibregl-popup-content-wrapper {
-  background: var(--glass-strong); color: var(--text);
-  border: 1px solid var(--line-bright); border-radius: 14px; padding: 0;
-  backdrop-filter: blur(14px); box-shadow: 0 20px 46px rgba(2, 6, 23, .6);
+
+/* Popup container — the actual content div. Must use !important throughout
+   because MapLibre's vendor sheet and inline styles both compete here. */
+.maplibregl-popup-content {
+  background: rgba(8, 14, 28, 0.97) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--line-bright) !important;
+  border-radius: 14px !important;
+  padding: 14px 16px 12px !important;
+  font-size: 13.4px !important;
+  line-height: 1.55 !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 46px rgba(2, 6, 23, .7) !important;
+  pointer-events: auto;
+  max-width: 280px;
 }
-.maplibregl-popup-content { margin: 13px 15px; font-size: 13.4px; line-height: 1.55; }
-.maplibregl-popup-content h4 { margin: 0 0 6px; font: 650 14.5px/1.3 var(--sans); }
-.maplibregl-popup-content .pp { margin: 0 0 9px; color: var(--muted); font-size: 12.6px; }
-.maplibregl-popup-tip { border-top-color: var(--line-bright) !important; border-bottom-color: var(--line-bright) !important; }
+.maplibregl-popup-content h4 {
+  margin: 0 0 6px; font: 650 14.5px/1.3 var(--sans) !important;
+  color: #fff !important;
+}
+.maplibregl-popup-content .pp {
+  margin: 0 0 9px !important; color: var(--muted) !important; font-size: 12.6px !important;
+}
+.maplibregl-popup-content p {
+  margin: 0 0 9px !important; color: var(--text-soft) !important; font-size: 13px !important;
+}
+.maplibregl-popup-content p:last-child { margin-bottom: 0 !important; }
+
+/* Override every tip-anchor variant — each sets its own border-color */
+.maplibregl-popup-anchor-top    .maplibregl-popup-tip { border-bottom-color: rgba(8,14,28,0.97) !important; }
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip { border-bottom-color: rgba(8,14,28,0.97) !important; }
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip { border-bottom-color: rgba(8,14,28,0.97) !important; }
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip { border-top-color: rgba(8,14,28,0.97) !important; }
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip { border-top-color: rgba(8,14,28,0.97) !important; }
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip { border-top-color: rgba(8,14,28,0.97) !important; }
+.maplibregl-popup-anchor-left  .maplibregl-popup-tip { border-right-color: rgba(8,14,28,0.97) !important; }
+.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color:  rgba(8,14,28,0.97) !important; }
+
 .maplibregl-popup-close-button {
-  color: var(--muted) !important; font-size: 17px !important; padding: 6px 8px 0 0 !important;
+  color: var(--muted) !important; font-size: 18px !important;
+  padding: 4px 8px 0 0 !important; line-height: 1 !important;
+  background: transparent !important;
 }
-.maplibregl-popup-close-button:hover { color: var(--text) !important; background: transparent !important; }
+.maplibregl-popup-close-button:hover { color: #fff !important; background: transparent !important; }
 .maplibregl-canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .pp-link { color: var(--accent) !important; text-decoration: none; font: 600 12.4px/1 var(--sans); letter-spacing: 0.01em; }
 .pp-link:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -559,7 +620,11 @@ select.chip option { background: var(--bg-1); color: var(--text); }
 }
 .tl li.now::before {
   border-color: var(--red); border-width: 2px;
-  box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.18), 0 0 10px rgba(225, 29, 72, 0.3);
+  animation: pulse-now 2.6s ease-in-out infinite;
+}
+@keyframes pulse-now {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.18), 0 0 10px rgba(225, 29, 72, 0.3); }
+  50%       { box-shadow: 0 0 0 8px rgba(225, 29, 72, 0.08), 0 0 22px rgba(225, 29, 72, 0.5); }
 }
 .tl .yr { font: 600 11.5px/1 var(--mono); letter-spacing: 0.1em; color: var(--accent); }
 .tl li.now .yr { color: #ff8fa3; }

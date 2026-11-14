@@ -28,11 +28,22 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "name": "Media — Canadian UAP documentaries, news film and podcasts",
-  "url": "https://nosytlabs.github.io/canadian-ufo/media.html",
-  "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" },
-  "description": "Verified Canadian UAP video and audio, with publisher, date and a link back to the case each item documents."
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "Media — Canadian UAP documentaries, news film and podcasts",
+      "url": "https://nosytlabs.github.io/canadian-ufo/media.html",
+      "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" },
+      "description": "Verified Canadian UAP video and audio, with publisher, date and a link back to the case each item documents."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "AURORA", "item": "https://nosytlabs.github.io/canadian-ufo/" },
+        { "@type": "ListItem", "position": 2, "name": "Media", "item": "https://nosytlabs.github.io/canadian-ufo/media.html" }
+      ]
+    }
+  ]
 }
 </script>
 </head>

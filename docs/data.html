@@ -28,11 +28,22 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "Open data and how to get the records yourself",
-  "url": "https://nosytlabs.github.io/canadian-ufo/data.html",
-  "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" },
-  "description": "Verified Canadian government API endpoints and access-to-information routes for UAP records."
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": "Open data and how to get the records yourself",
+      "url": "https://nosytlabs.github.io/canadian-ufo/data.html",
+      "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" },
+      "description": "Verified Canadian government API endpoints and access-to-information routes for UAP records."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "AURORA", "item": "https://nosytlabs.github.io/canadian-ufo/" },
+        { "@type": "ListItem", "position": 2, "name": "Open data", "item": "https://nosytlabs.github.io/canadian-ufo/data.html" }
+      ]
+    }
+  ]
 }
 </script>
 </head>

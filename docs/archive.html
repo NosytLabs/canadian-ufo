@@ -28,11 +28,22 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "name": "Archival index — 1,510 Canadian UFO descriptions",
-  "description": "Every indexed description in the Library and Archives Canada UFO database, with links to the live archival record.",
-  "url": "https://nosytlabs.github.io/canadian-ufo/archive.html",
-  "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" }
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "Archival index — 1,510 Canadian UFO descriptions",
+      "description": "Every indexed description in the Library and Archives Canada UFO database, with links to the live archival record.",
+      "url": "https://nosytlabs.github.io/canadian-ufo/archive.html",
+      "isPartOf": { "@type": "WebSite", "name": "AURORA", "url": "https://nosytlabs.github.io/canadian-ufo/" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "AURORA", "item": "https://nosytlabs.github.io/canadian-ufo/" },
+        { "@type": "ListItem", "position": 2, "name": "Archive index", "item": "https://nosytlabs.github.io/canadian-ufo/archive.html" }
+      ]
+    }
+  ]
 }
 </script>
 </head>
@@ -272,7 +283,7 @@
       </div></li>
       <li><span class="bullet"></span><div>
         <a href="https://recherche-research.bac-lac.gc.ca/eng/public/list/43130" target="_blank" rel="noopener">Curated guide — 1967 Shag Harbour sighting and related research</a>
-        <div class="desc">LAC's own research guide assembles the Shag Harbour material, with volume and microfilm references.. This is the single best starting point for a specific case.</div>
+        <div class="desc">LAC's own research guide assembles the Shag Harbour material, with volume and microfilm references. This is the single best starting point for a specific case.</div>
       </div></li>
       <li><span class="bullet"></span><div>
         <a href="https://www.canada.ca/en/library-archives/collection/research-help/science-technology/ufos.html" target="_blank" rel="noopener">LAC scope page — Canada's UFOs: the search for the unknown</a>
