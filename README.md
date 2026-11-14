@@ -1,5 +1,7 @@
 # AURORA — Canada's UAP record, indexed
 
+**Live site:** <https://nosytlabs.github.io/canadian-ufo/>
+
 An independent, non-governmental index of Canada's federal unidentified aerial
 phenomena (UAP) file. Four federal departments kept UFO records between 1947 and
 the early 1980s; the access-to-information releases that followed add thousands
@@ -8,6 +10,21 @@ more pages. Almost none of it is searchable. This project indexes it.
 **AURORA is not affiliated with the Government of Canada.** Government documents
 linked here remain Crown property. Nothing here is evidence of extraterrestrial
 activity — "unidentified" is the finding, not a conclusion.
+
+## What you can do with this
+
+- **Browse the case files** — 18 documented incidents from 1947 to 2023, each
+  with sourcing grade, primary documents or mainstream reporting, and a map pin.
+- **Search the LAC index** — 1,510 distinct records from Library and Archives
+  Canada, queryable by keyword, with province and date filters.
+- **Download the data** — `site/data/cases.json`, `releases.json`,
+  `timeline.json`, and `endpoints.json` are plain JSON with stable field names
+  and are suitable for research, journalism, or further indexing.
+- **File an ATI request** — the data page lists the department codes, collection
+  references, and form links needed to request the underlying documents from LAC.
+- **Verify the sources** — every case links to the document or article it draws
+  on. The sourcing grade tells you whether a government file has been read or
+  whether the case rests on mainstream reporting.
 
 ## What is here
 
