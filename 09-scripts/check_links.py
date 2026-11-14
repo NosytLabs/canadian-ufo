@@ -60,6 +60,15 @@ BOT_BLOCKED = (
     # NUFORC serves people. A 403 from a scripted request is the expected
     # answer, and the data.html endpoint list already marks its rows amber.
     "nuforc.org",
+    # Library and Archives Canada UFO database. All ~1,510 deep record links
+    # (001057-110.01-e.php and 001057-119.01-e.php) return 403 to scripted
+    # requests while serving the same pages in a browser. Verified reachable
+    # on 2026-11-14 by manual fetch of representative URLs.
+    "collectionscanada.gc.ca",
+    # Nunatsiaq News (Nunavut) and The Walrus both return 403 to automated
+    # clients but serve normally in a browser. Verified 2026-11-14.
+    "nunatsiaq.com",
+    "thewalrus.ca",
 )
 
 
@@ -71,8 +80,8 @@ def blocked_host(url):
 
 # canada.ca stalls every scripted request from this host, so the four LAC/DND
 # URLs below can never be verified from the command line. Each was fetched in a
-# real browser on 2026-09-29 and returned 200 with the expected title; they are
-# listed by path so a change to one of them still fails the check.
+# real browser (last verified 2026-11-14) and returned 200 with the expected
+# title; they are listed by path so a change to one of them still fails the check.
 SCRIPT_STALLED = {
     "/en/library-archives/collection/research-help/science-technology/ufos.html",
     "/en/library-archives/collection/engage-learn/podcasts/discover/episode-053.html",

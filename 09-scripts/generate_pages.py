@@ -117,7 +117,7 @@ HEAD = """<!DOCTYPE html>
 <meta property="og:locale" content="en_CA">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{title}">
-<meta name="twitter:description" content="{desc}">
+<meta name="twitter:description" content="{twitter_desc}">
 <meta name="twitter:image" content="{base}/assets/og.png">
 <link rel="stylesheet" href="assets/base.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304060c'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%235fd4e8' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%235fd4e8'/%3E%3C/svg%3E">
@@ -218,6 +218,7 @@ def case_page(c, all_cases, media):
     label, chip, caveat = CONF.get(c["conf"], CONF["partial"])
     title = "%s, %s (%s) — Canadian UAP case file" % (c["title"], c.get("prov", "Canada"), c["date"][:4])
     desc = trim(c["summary"], 155)
+    twitter_desc = trim(c["summary"], 200)
 
     jsonld = json.dumps({
         "@context": "https://schema.org",
@@ -278,8 +279,8 @@ def case_page(c, all_cases, media):
         for x in others)
 
     body = HEAD.format(
-        title=esc(title), desc=esc(desc), base=BASE, slug=c["slug"],
-        jsonld=jsonld, nav=nav("case.html")) + f"""
+        title=esc(title), desc=esc(desc), twitter_desc=esc(twitter_desc),
+        base=BASE, slug=c["slug"], jsonld=jsonld, nav=nav("case.html")) + f"""
   <section class="hero hero-tight">
     <div class="hero-inner hero-1col">
       <div>
