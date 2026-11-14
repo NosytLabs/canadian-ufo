@@ -378,19 +378,19 @@ the live open-data endpoints that serve the record today.
 - /releases.html : 40 records in five tranches, searchable
 - /archive.html : 1,510 archival descriptions, searchable and sortable
 - /case.html : all case files, graded by sourcing quality
-- /map.html : eighteen case locations on an interactive Canada map
+- /map.html : nineteen case locations on an interactive Canada map
 - /media.html : verified Canadian documentary and news video
 - /data.html : open-government endpoints, live CKAN queries, how to request records
 - /case-<slug>.html : one stable, citable page per case (Shag Harbour, Falcon Lake, Gander 1951,
   Gander 1974, Stephenville, the Night of the UFOs, Saint John, Fredericton, Moncton, Clarenville,
   Kensington, Baffin Island, Prince George, Montreal, the Yukon row of lights, the New Brunswick
-  protected-airspace report, the Yukon intercept, and the Falcon Lake region wave)
+  protected-airspace report, the Yukon intercept, and the Falcon Lake region wave, and Shirley's Bay (Project Magnet 1954))
 
 ## Data
 
 - /data/releases.json : 40 release records
 - /data/lac.json : 1,510 archival descriptions with source URLs
-- /data/cases.json : 18 case files with coordinates and source links
+- /data/cases.json : 19 case files with coordinates and source links
 - /data/timeline.json : the record year by year, 1947 to now
 - /data/media.json : video items, each with the case it documents
 - /data/podcasts.json : LAC Discover podcast episodes. [{id, title, len, size, published, org,
@@ -455,12 +455,12 @@ Sitemap: __BASE__/sitemap.xml
 # Pages that state the case count in prose. Hand-written pages are the only
 # place a count can rot: the data gained a case and the sentence did not.
 PROSE_COUNTS = [
-    ("index.html", "Eighteen case files with locations"),
-    ("map.html", "Eighteen Canadian UAP cases, mapped"),
-    ("map.html", "Eighteen Canadian UAP case locations"),
-    ("data.html", "18 case files with coordinates"),
-    ("llms.txt", "18 case files with coordinates"),
-    ("case.html", "eighteen Canadian UAP cases"),
+    ("index.html", "Nineteen case files with locations"),
+    ("map.html", "Nineteen Canadian UAP cases, mapped"),
+    ("map.html", "Nineteen Canadian UAP case locations"),
+    ("data.html", "19 case files with coordinates"),
+    ("llms.txt", "19 case files with coordinates"),
+    ("case.html", "nineteen Canadian UAP cases"),
 ]
 
 # Numbers that came out of measuring the LAC browse interface. The build writes
