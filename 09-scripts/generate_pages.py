@@ -273,7 +273,12 @@ def case_page(c, all_cases, media):
 
 """ % ("\n".join("      " + player(m) for m in mine))
 
-    others = [x for x in all_cases if x["slug"] != c["slug"]][:5]
+    # Same-region cases first, then by date — gives the reader something
+    # geographically useful rather than a fixed slice of the array.
+    cur_region = c.get("region", "")
+    def _related_key(x):
+        return (0 if x.get("region") == cur_region else 1, x.get("date", ""))
+    others = sorted([x for x in all_cases if x["slug"] != c["slug"]], key=_related_key)[:5]
     related = "\n".join(
         '<li><span class="bullet"></span><div><a href="case-%s.html">%s</a> '
         '<span class="chip">%s</span><div class="desc">%s</div></div></li>'
@@ -327,7 +332,7 @@ def case_page(c, all_cases, media):
       <div class="sec-num">→</div>
       <div class="sec-head-col">
         <h2 class="sec-title">Other case files</h2>
-        <p class="sec-dek">Eighteen cases in the Canadian record, graded by sourcing.</p>
+        <p class="sec-dek">Nineteen cases in the Canadian record, graded by sourcing.</p>
       </div>
     </div>
     <ul class="linklist">
