@@ -196,10 +196,10 @@
           map.addLayer({
             id: "case-halo", type: "circle", source: "cases",
             paint: {
-              "circle-radius": ["interpolate", ["linear"], ["zoom"], 2, 11, 8, 20],
+              "circle-radius": ["interpolate", ["linear"], ["zoom"], 2, 13, 8, 24],
               "circle-color": confColorExpr(),
-              "circle-opacity": 0.14,
-              "circle-blur": 0.7
+              "circle-opacity": 0.20,
+              "circle-blur": 0.6
             }
           });
           map.addLayer({
@@ -374,7 +374,8 @@
             '<p class="pp">' + esc(p.display) + " &middot; " + esc(p.region) + "</p>" +
             "<p>" + esc(p.summary) + "</p>" +
             '<p class="pp conf-' + confKey(p.grade) + '"><span class="label">' +
-              esc(p.label) + "</span></p>";
+              esc(p.label) + "</span></p>" +
+            '<p><a href="case-' + esc(p.slug) + '.html" class="pp-link">View case file →</a></p>';
         }
 
         // Deep link. Every case page's "view on map" chip links to

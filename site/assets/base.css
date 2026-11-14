@@ -546,6 +546,8 @@ select.chip option { background: var(--bg-1); color: var(--text); }
 }
 .maplibregl-popup-close-button:hover { color: var(--text) !important; background: transparent !important; }
 .maplibregl-canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.pp-link { color: var(--accent) !important; text-decoration: none; font: 600 12.4px/1 var(--sans); letter-spacing: 0.01em; }
+.pp-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------------------------------------------------------------- timeline */
 .tl { position: relative; margin: 0; padding: 0 0 0 30px; list-style: none; }
