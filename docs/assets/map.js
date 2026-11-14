@@ -294,8 +294,14 @@
             if (c.lat > n) n = c.lat;
           });
           var padLon = Math.max((e - w) * 0.12, 3);
-          var padLat = Math.max((n - s) * 0.22, 2);
-          return { west: w - padLon, east: e + padLon, south: s - padLat, north: n + padLat };
+          // Asymmetric vertical padding: the cases cluster near the southern edge
+          // of Canada (Shag Harbour at 43.85 N), so a symmetric pad pushed the
+          // bottom of the frame down to 38-39 N — deep into the US midwest.
+          // Generous north padding keeps the Arctic in frame; minimal south
+          // padding keeps the US out.
+          var padLatN = Math.max((n - s) * 0.22, 3);
+          var padLatS = Math.max((n - s) * 0.04, 1);
+          return { west: w - padLon, east: e + padLon, south: s - padLatS, north: n + padLatN };
         }
 
         // Re-fit on resize, debounced. Only while the user has not moved the
