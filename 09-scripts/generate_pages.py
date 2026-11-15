@@ -218,6 +218,11 @@ def player(m):
 
 def case_page(c, all_cases, media):
     label, chip, caveat = CONF.get(c["conf"], CONF["partial"])
+    # Prev/next by date, oldest first — the natural reading order for a historical archive.
+    _sorted = sorted(all_cases, key=lambda x: x.get("date", ""))
+    _idx = next((i for i, x in enumerate(_sorted) if x["slug"] == c["slug"]), -1)
+    prev_c = _sorted[_idx - 1] if _idx > 0 else None
+    next_c = _sorted[_idx + 1] if _idx < len(_sorted) - 1 else None
     title = "%s, %s (%s) — Canadian UAP case file" % (c["title"], c.get("prov", "Canada"), c["date"][:4])
     desc = trim(c["summary"], 155)
     twitter_desc = trim(c["summary"], 200)
@@ -285,6 +290,15 @@ def case_page(c, all_cases, media):
         % (esc(x["slug"]), esc(x["title"]), esc(x.get("prov", "")), esc(x["summary"][:120]) + "…")
         for x in others)
 
+    prev_nav = ('      <a class="case-nav-item case-nav-prev" href="case-%s.html">'
+               '<span class="case-nav-dir">← Earlier</span>'
+               '<span class="case-nav-title">%s, %s</span></a>'
+               % (esc(prev_c["slug"]), esc(prev_c["title"]), esc(prev_c["date"][:4]))) if prev_c else "      <span></span>"
+    next_nav = ('      <a class="case-nav-item case-nav-next" href="case-%s.html">'
+               '<span class="case-nav-dir">Later →</span>'
+               '<span class="case-nav-title">%s, %s</span></a>'
+               % (esc(next_c["slug"]), esc(next_c["title"]), esc(next_c["date"][:4]))) if next_c else "      <span></span>"
+
     body = HEAD.format(
         title=esc(title), desc=esc(desc), twitter_desc=esc(twitter_desc),
         base=BASE, slug=c["slug"], jsonld=jsonld, nav=nav("case.html")) + f"""
@@ -338,6 +352,10 @@ def case_page(c, all_cases, media):
     <ul class="linklist">
 {related}
     </ul>
+    <nav class="case-nav" aria-label="Previous and next case">
+{prev_nav}
+{next_nav}
+    </nav>
     <p class="mt-8"><a class="btn" href="case.html">All case files</a></p>
   </section>
 """ + FOOT

@@ -270,14 +270,21 @@
   // be a hand-typed second copy that drifted.
   function caseCard(c) {
     var cl = Aurora.conf(c.conf);
+    // Year extracted from ISO date (e.g. "1967-10-04" → "1967")
+    var year = c.date ? c.date.slice(0, 4) : "";
     return '<article class="card conf-' + (Aurora.CONF[c.conf] ? c.conf : "partial") +
       '" data-case-card="' + esc(c.slug) + '" id="' + esc(c.slug) + '">' +
-      '<div class="chips card-chips"><span class="chip ' + cl.chip + '">' + cl.short + "</span>" +
-        '<span class="chip">' + esc(c.display) + "</span>" +
+      '<div class="card-header">' +
+        '<span class="card-year">' + esc(year) + "</span>" +
+        '<span class="chip ' + cl.chip + '">' + cl.short + "</span>" +
+      "</div>" +
+      '<div class="chips card-chips">' +
         (c.prov ? '<span class="chip">' + esc(c.prov) + "</span>" : "") +
-        (c.tag ? '<span class="chip">' + esc(c.tag) + "</span>" : "") + "</div>" +
+        (c.region ? '<span class="chip">' + esc(c.region) + "</span>" : "") +
+        (c.tag ? '<span class="chip">' + esc(c.tag) + "</span>" : "") +
+      "</div>" +
       "<h3>" + esc(c.title) + "</h3><p>" + esc(c.summary) + "</p>" +
-      '<div class="meta"><a class="btn" href="case-' + esc(c.slug) + '.html">Open case file</a></div></article>';
+      '<div class="meta"><a class="btn" href="case-' + esc(c.slug) + '.html">Case file &rarr;</a></div></article>';
   }
 
   function sortCases(cases) {
