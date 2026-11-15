@@ -604,5 +604,34 @@
       }
     ],
     "media": []
+  },
+  {
+    "slug": "harbour-mille-2010",
+    "title": "Harbour Mille",
+    "prov": "NL",
+    "region": "Atlantic",
+    "date": "2010-01-25",
+    "display": "25 January 2010",
+    "conf": "reported",
+    "lat": 47.57,
+    "lon": -55.83,
+    "tag": "Multi-witness",
+    "summary": "Residents of Harbour Mille, Newfoundland — including an RCMP officer — watched what appeared to be two or three luminous objects rise from Fortune Bay and climb into the night sky. The Department of National Defence confirmed it had no explanation; suggested connections to French naval activity in the region were officially denied.",
+    "detail": [
+      "Among the witnesses was an RCMP officer whose account gave the sighting official standing in the media record and in correspondence between the local MP and the Minister of National Defence. Multiple residents described two or three luminous objects ascending from or near Fortune Bay and climbing in an arc — a profile more consistent with a launch than with a horizontal sighting. The event lasted several minutes and was visible across different parts of the community.",
+      "The Department of National Defence confirmed it had no information about any scheduled activity in the area. The Joint Rescue Coordination Centre Atlantic, which tracks military movements in the region, also had no record of an exercise. French naval vessels were operating in nearby waters; French authorities denied any connection to activity in the area.",
+      "The case received national media coverage and produced correspondence in the House of Commons. No definitive explanation has been published. It sits at the boundary between civilian sighting and official response: too well-attested by named witnesses to dismiss and too poorly documented at primary source to grade above mainstream reporting. It is also the most recent Atlantic case in this index to have prompted a named government response."
+    ],
+    "docs": [
+      {
+        "label": "CBC News — Newfoundland-Labrador — Harbour Mille sighting, January 2010",
+        "url": "https://www.cbc.ca/news/canada/newfoundland-labrador/harbour-mille-residents-report-mystery-missiles-1.900225"
+      },
+      {
+        "label": "Internet Archive — CanadaUFO collection (8,000-page mirror of the declassified Canadian file)",
+        "url": "https://archive.org/details/CanadaUFO"
+      }
+    ],
+    "media": []
   }
 ]

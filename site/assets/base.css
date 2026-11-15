@@ -206,7 +206,11 @@ body {
 .mt-8 { margin-top: 24px; }
 .mb-4 { margin-bottom: 18px; }
 .sec-title-sm { font-size: 26px; margin-bottom: 18px; }
-.card-note { padding: 18px 20px; margin-top: 26px; }
+.card-note {
+  padding: 18px 20px; margin-top: 26px;
+  background: rgba(95, 212, 232, 0.04) !important;
+  border-color: var(--accent-line) !important;
+}
 .grid-top { align-items: start; }
 .note { color: var(--muted); font-size: 13.6px; }
 .faint { color: var(--faint); font-size: 12.5px; }
@@ -314,7 +318,7 @@ section:first-of-type { border-top: 0; }
   text-shadow: 0 0 18px rgba(95, 212, 232, 0.6), 0 0 6px rgba(95, 212, 232, 0.4);
 }
 .sec-head-col { min-width: 0; }
-.sec-title { margin: 0; font: 700 clamp(25px, 3.6vw, 38px)/1.14 var(--sans); letter-spacing: -0.028em; }
+.sec-title { margin: 0; font: 700 clamp(25px, 3.6vw, 38px)/1.14 var(--sans); letter-spacing: -0.028em; color: #fff; }
 .sec-dek { margin: 12px 0 0; max-width: 68ch; color: var(--muted); font-size: 15px; }
 
 .grid { display: grid; gap: 18px; }
