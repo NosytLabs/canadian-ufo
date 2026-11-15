@@ -14,8 +14,8 @@
   --accent-wash: rgba(95, 212, 232, 0.11);
   --accent-line: rgba(95, 212, 232, 0.34);
 
-  --bg-0: #04060c;
-  --bg-1: #0a1020;
+  --bg-0: #040810;
+  --bg-1: #0b1222;
   --glass: rgba(14, 21, 38, 0.52);
   --glass-strong: rgba(10, 16, 30, 0.86);
   --line: rgba(148, 176, 214, 0.16);
@@ -41,8 +41,8 @@
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "Cascadia Mono",
           "Segoe UI Mono", Consolas, "Liberation Mono", monospace;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --r: 18px;
-  --r-sm: 12px;
+  --r: 14px;
+  --r-sm: 9px;
   --max: 1240px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   /* Sticky header height; keeps scroll-padding and the mobile nav honest. */
@@ -75,7 +75,7 @@ body {
     radial-gradient(55vw 44vh at 96%  1%,  rgba(110, 168, 255, 0.17), transparent 58%),
     radial-gradient(36vw 26vh at 74%  7%,  rgba(148, 100, 240, 0.09), transparent 50%),
     radial-gradient(44vw 38vh at 48% 102%, rgba(95, 212, 232, 0.08), transparent 54%),
-    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 48%, #02040a 100%);
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 48%, #030610 100%);
 }
 
 .shell { position: relative; z-index: 1; }
@@ -89,11 +89,19 @@ body {
   align-items: center;
   gap: 18px;
   padding: 12px clamp(16px, 4vw, 40px);
-  background: color-mix(in srgb, var(--bg-0) 78%, transparent);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  background: color-mix(in srgb, var(--bg-0) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
   box-shadow: 0 1px 0 rgba(148,176,214,0.12), 0 4px 24px rgba(2,6,23,0.4);
   min-height: var(--head-h);
+}
+/* Rainbow top-line: immediately visible marker of a live, active site */
+.site-head::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; z-index: 1;
+  background: linear-gradient(90deg,
+    var(--conf-partial) 0%,
+    var(--accent) 42%,
+    var(--conf-reported) 100%);
 }
 .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; color: var(--text); }
 @keyframes brand-glow {
@@ -129,7 +137,7 @@ body {
 .brand-name { font: 600 16px/1 var(--sans); letter-spacing: 0.14em; }
 .brand-sub { display: block; font: 400 10px/1.5 var(--mono); letter-spacing: 0.1em; color: var(--faint); text-transform: uppercase; margin-top: 3px; }
 
-.nav { margin-left: auto; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.nav { margin-left: auto; display: flex; gap: 4px; align-items: center; flex-wrap: nowrap; overflow: hidden; }
 .nav a {
   color: var(--text-soft); text-decoration: none; font: 500 13.5px/1 var(--sans);
   padding: 9px 12px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap;
@@ -265,7 +273,7 @@ body {
   box-shadow: 0 18px 44px rgba(2, 6, 23, 0.4), 0 0 0 1px rgba(95, 212, 232, 0.08) inset;
   backdrop-filter: blur(18px) saturate(130%);
   -webkit-backdrop-filter: blur(18px) saturate(130%);
-  border: 1px solid var(--line);
+  border: 1px solid color-mix(in srgb, var(--line) 100%, var(--accent) 8%);
   transition: border-color .18s var(--ease), box-shadow .18s var(--ease);
   /* top-edge highlight same as cards */
   position: relative; overflow: hidden;
@@ -406,9 +414,9 @@ article.card[data-year]::after {
   pointer-events: none; z-index: 0;
   transition: opacity .18s;
 }
-article.card.conf-primary[data-year]::after  { color: rgba(95,  212, 232, 0.07); }
-article.card.conf-reported[data-year]::after { color: rgba(143, 166, 247, 0.07); }
-article.card.conf-partial[data-year]::after  { color: rgba(245, 158,  11, 0.07); }
+article.card.conf-primary[data-year]::after  { color: rgba(95,  212, 232, 0.13); }
+article.card.conf-reported[data-year]::after { color: rgba(143, 166, 247, 0.13); }
+article.card.conf-partial[data-year]::after  { color: rgba(245, 158,  11, 0.13); }
 article.card[data-year]:hover::after { opacity: 1.6; }
 
 
@@ -952,20 +960,14 @@ html:not(.js) .spinner { display: none; }
 .error-note { padding: 18px 20px; border-radius: var(--r-sm); border: 1px solid rgba(225,29,72,.3); background: var(--red-soft); color: #ffc4d0; font-size: 13.4px; }
 
 /* ----------------------------------------------------------- responsive */
-@media (max-width: 940px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero .tagline { max-width: 26ch; }
-  .readout { order: 2; }
-}
-@media (max-width: 760px) {
-  /* .site-head is position:sticky, so it is already the containing block for
-     an absolutely positioned child — no magic offset to keep in sync. */
+@media (max-width: 900px) {
+  /* Nav collapses at 900px to avoid wrapping; layout rules stay at 760px below */
   .nav {
     position: absolute; top: 100%; left: 0; right: 0;
-    flex-direction: column; align-items: stretch; gap: 2px;
+    flex-direction: column; align-items: stretch; gap: 2px; overflow: visible;
     margin: 0; padding: 14px clamp(16px, 4vw, 40px) 20px;
     background: color-mix(in srgb, var(--bg-0) 96%, var(--accent) 4%);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--line);
     max-height: calc(100vh - var(--head-h)); overflow-y: auto; display: none;
   }
@@ -973,11 +975,20 @@ html:not(.js) .spinner { display: none; }
   .nav a { padding: 12px 14px; border-radius: 10px; font-size: 14.5px; }
   .nav-toggle {
     display: inline-grid; place-items: center; margin-left: auto; width: 40px; height: 38px; cursor: pointer;
-    border-radius: 10px; border: 1px solid var(--line); background: rgba(148, 176, 214, 0.08); color: var(--text);
-    font-size: 18px;
-    transition: background .18s var(--ease), border-color .18s var(--ease);
+    border-radius: 10px; border: 1px solid var(--line); background: rgba(148, 214, 214, 0.08); color: var(--text);
+    font-size: 18px; transition: background .18s var(--ease), border-color .18s var(--ease);
+    flex-shrink: 0;
   }
   .nav-toggle:hover { background: var(--accent-wash); border-color: var(--accent-line); }
+}
+
+@media (max-width: 940px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero .tagline { max-width: 26ch; }
+  .readout { order: 2; }
+}
+@media (max-width: 760px) {
+  /* Nav/toggle are handled at 900px above; this block covers layout rules only. */
   .sec-head { grid-template-columns: 1fr; gap: 8px; }
   .sec-num { text-align: left; border-top: 0; padding-top: 0; }
   .count-note { margin-left: 0; width: 100%; }
