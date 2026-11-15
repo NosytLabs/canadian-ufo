@@ -304,6 +304,14 @@ def case_page(c, all_cases, media):
     body = HEAD.format(
         title=esc(title), desc=esc(desc), twitter_desc=esc(twitter_desc),
         base=BASE, slug=c["slug"], jsonld=jsonld, nav=nav("case.html")) + f"""
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="index.html">AURORA</a>
+    <span aria-hidden="true">&#8250;</span>
+    <a href="case.html">Case files</a>
+    <span aria-hidden="true">&#8250;</span>
+    <span aria-current="page">{esc(c['title'])}</span>
+  </nav>
+
   <section class="hero hero-tight hero-case hero-case-{conf_key}">
     <div class="hero-inner hero-1col">
       <div>

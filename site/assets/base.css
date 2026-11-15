@@ -889,6 +889,43 @@ td .none { color: var(--faint); font-style: italic; }
 .card .readout-label { font-size: 11px; letter-spacing: 0.14em; }
 .card:hover .readout-num { text-shadow: 0 0 32px rgba(95, 212, 232, 0.5); }
 
+
+/* ---------------------------------------------------------- breadcrumb nav */
+.breadcrumb {
+  max-width: var(--max); margin: 0 auto;
+  padding: 14px clamp(16px, 4vw, 40px) 0;
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  font: 400 12px/1 var(--mono); color: var(--faint); letter-spacing: 0.03em;
+}
+.breadcrumb a { color: var(--text-soft); text-decoration: none; transition: color .15s; }
+.breadcrumb a:hover { color: var(--accent); }
+.breadcrumb span[aria-current="page"] { color: var(--muted); }
+.breadcrumb span[aria-hidden="true"] { color: var(--faint); font-size: 14px; }
+
+/* --------------------------------------------------- decade distribution chart */
+.decade-chart { padding: 24px 26px; }
+.decade-chart .note { max-width: 72ch; }
+.decade-row {
+  display: grid; grid-template-columns: 46px 1fr 28px;
+  gap: 12px; align-items: center; margin-bottom: 9px;
+}
+.decade-label { font: 600 11px/1 var(--mono); color: var(--faint); letter-spacing: 0.08em; }
+.decade-bar-wrap {
+  height: 8px; border-radius: 999px; overflow: hidden;
+  background: rgba(148, 176, 214, 0.08);
+}
+.decade-bar-fill {
+  height: 100%; border-radius: 999px;
+  background: var(--accent-dim);
+  transition: width .4s var(--ease);
+}
+/* Confidence-tinted bars */
+.decade-bar-fill.conf-primary  { background: linear-gradient(90deg, var(--conf-primary), #3abfd6); box-shadow: 0 0 8px rgba(95,212,232,0.3); }
+.decade-bar-fill.conf-reported { background: linear-gradient(90deg, var(--conf-reported), #6a8ef0); }
+.decade-bar-fill.conf-partial  { background: linear-gradient(90deg, var(--conf-partial), #d9870a); }
+.decade-row-count { text-align: right; font: 700 12px/1 var(--mono); color: var(--accent); }
+.decade-row-count.faint { color: var(--faint); font-weight: 400; }
+
 /* -------------------------------------------------- archive gap visualisation */
 .gap-vis { margin: 28px 0; }
 .gap-label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
