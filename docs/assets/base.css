@@ -183,7 +183,7 @@ body {
   background-clip: text;
 }
 .hero .tagline { margin: 14px 0 0; max-width: 34ch; font: 400 clamp(17px, 2.1vw, 22px)/1.56 var(--serif); color: var(--text); }
-.hero-lede { margin: 22px 0 0; max-width: 64ch; color: var(--muted); font-size: 15.5px; }
+.hero-lede { margin: 22px 0 0; max-width: 62ch; color: var(--muted); font-size: 15.5px; line-height: 1.72; }
 .hero-lede strong { color: var(--text-soft); font-weight: 600; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; align-items: center; }
 .hero-tight { padding-bottom: clamp(28px, 3.5vw, 56px); }
@@ -348,7 +348,7 @@ section + section::before {
   background: linear-gradient(135deg, #fff 10%, #d6f4fa 55%, var(--accent) 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-.sec-dek { margin: 12px 0 0; max-width: 68ch; color: var(--muted); font-size: 15px; }
+.sec-dek { margin: 12px 0 0; max-width: 68ch; color: var(--muted); font-size: 15px; line-height: 1.65; }
 
 .grid { display: grid; gap: 18px; }
 .g-2 { grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); }
@@ -385,7 +385,7 @@ section + section::before {
 /* Card header: year badge + confidence chip side by side */
 .card-header {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 10px; gap: 8px;
 }
 .card-year {
   font: 700 13px/1 var(--mono); letter-spacing: 0.08em;
@@ -445,8 +445,9 @@ aside.card h3 {
 }
 .tranche:hover { background: rgba(14, 22, 40, 0.8); border-left-color: var(--accent-line); }
 .tranche-n {
-  font: 600 24px/1 var(--mono); letter-spacing: -0.02em; color: var(--accent);
+  font: 700 26px/1 var(--mono); letter-spacing: -0.02em; color: var(--accent);
   font-variant-numeric: tabular-nums; padding-top: 2px;
+  text-shadow: 0 0 16px rgba(95, 212, 232, 0.4);
 }
 .tranche-body h3 { margin: 0 0 5px; font: 650 17.5px/1.3 var(--sans); letter-spacing: -0.015em; }
 .tranche-body p { margin: 0; color: var(--muted); font-size: 14.2px; max-width: 78ch; }
@@ -530,8 +531,12 @@ aside.card h3 {
 /* Small dot indicator inside the filter buttons */
 .seg button .chip {
   width: 7px; height: 7px; border-radius: 50%; padding: 0;
-  background: var(--conf, var(--accent)); border: 0; flex: 0 0 auto;
+  background: var(--accent); border: 0; flex: 0 0 auto;
 }
+/* Per-confidence dot colours inside filter buttons */
+.seg button[data-conf="primary"] .chip { background: var(--conf-primary); }
+.seg button[data-conf="reported"] .chip { background: var(--conf-reported); }
+.seg button[data-conf="partial"]  .chip { background: var(--conf-partial); }
 .seg button:hover:not(:disabled) { color: var(--text); background: rgba(148, 176, 214, 0.1); }
 .seg button[aria-pressed="true"] {
   color: var(--accent-ink); font-weight: 600;
@@ -838,7 +843,7 @@ td .none { color: var(--faint); font-style: italic; }
 .qa summary::-webkit-details-marker { display: none; }
 .qa summary::after { content: "+"; position: absolute; right: 8px; top: 19px; font: 400 22px/1 var(--mono); color: var(--accent); }
 .qa details[open] summary::after { content: "\2013"; }
-.qa summary:hover { color: #fff; }
+.qa summary:hover { color: var(--accent); }
 .qa .a { padding: 0 0 20px; color: var(--text-soft); font-size: 14.6px; max-width: 78ch; }
 .qa .a p { margin: 0 0 10px; }
 
