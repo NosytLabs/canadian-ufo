@@ -153,7 +153,7 @@ FOOT = """</main>
     <div>
       <h2>Case files</h2>
       <ul>
-        <li><a href="case.html">All eighteen cases</a></li>
+        <li><a href="case.html">All twenty cases</a></li>
         <li><a href="map.html">Case map</a></li>
         <li><a href="releases.html">The records behind these cases</a></li>
       </ul>
@@ -902,7 +902,7 @@ def assert_lac_prose():
 def rewrite_map_table(cases):
     """Replace map.html's case table with one generated from cases.json.
 
-    The page promises "the same eighteen cases, in text. No JavaScript needed",
+    The page promises "the same twenty cases, in text. No JavaScript needed",
     so this stays static HTML -- but it is written here, not by hand.
     """
     path = os.path.join(SITE, "map.html")

@@ -843,6 +843,30 @@ td .none { color: var(--faint); font-style: italic; }
 .case-nav-item:hover .case-nav-dir { color: var(--accent); }
 @media (max-width: 540px) { .case-nav { grid-template-columns: 1fr; } }
 
+
+/* -------------------------------------------------- archive gap visualisation */
+.gap-vis { margin: 28px 0; }
+.gap-label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.gap-label-a { font: 600 13.5px/1 var(--sans); color: var(--text-soft); }
+.gap-pct { color: var(--accent); margin-left: 6px; font-weight: 700; }
+.gap-label-b { font: 400 12.5px/1 var(--mono); color: var(--faint); }
+.gap-bar {
+  height: 10px; border-radius: 999px; overflow: hidden;
+  background: rgba(148, 176, 214, 0.1); border: 1px solid var(--line);
+}
+.gap-bar-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent) 0%, #3ec8de 100%);
+  box-shadow: 0 0 12px rgba(95, 212, 232, 0.4);
+  position: relative;
+}
+.gap-bar-fill::after {
+  content: ""; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 16px; border-radius: 2px;
+  background: rgba(255,255,255,0.8); box-shadow: 0 0 6px rgba(95,212,232,0.8);
+}
+.gap-legend { display: flex; justify-content: space-between; margin-top: 5px; font: 400 11px/1 var(--mono); color: var(--faint); }
+
 /* ----------------------------------------------------------------- footer */
 footer {
   border-top: 1px solid var(--line);
