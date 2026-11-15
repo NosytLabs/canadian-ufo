@@ -281,7 +281,7 @@ body {
 .startlist b { display: block; font: 600 14.5px/1.3 var(--sans); color: var(--text); }
 .startlist a:hover b { color: var(--accent); }
 .startlist span { display: block; font-size: 12.6px; color: var(--muted); margin-top: 2px; }
-.readout-label { font: 500 10.5px/1 var(--mono); letter-spacing: 0.15em; text-transform: uppercase; color: var(--faint); }
+.readout-label { font: 500 10.5px/1 var(--mono); letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); opacity: 0.7; }
 .figure { font: 500 clamp(32px, 4.6vw, 46px)/1 var(--sans); letter-spacing: -0.035em; color: #fff; font-variant-numeric: tabular-nums; margin-top: 10px; }
 .stat-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 /* The survey readout under the survey cards. It carried an inline
@@ -301,8 +301,8 @@ body {
   background: linear-gradient(180deg, rgba(95,212,232,0.04) 0px, transparent 32px);
 }
 .stat:hover { border-color: var(--accent-line); background: rgba(95, 212, 232, 0.05); }
-.stat b { display: block; font: 700 30px/1.1 var(--sans); letter-spacing: -0.04em; color: #fff; position: relative; transition: color .18s, text-shadow .18s; }
-.stat:hover b { color: var(--accent); text-shadow: 0 0 22px rgba(95, 212, 232, 0.4); }
+.stat b { display: block; font: 700 30px/1.1 var(--sans); letter-spacing: -0.04em; color: var(--accent); position: relative; transition: text-shadow .18s; }
+.stat:hover b { text-shadow: 0 0 22px rgba(95, 212, 232, 0.5); }
 .stat span { display: block; font: 400 11.5px/1.45 var(--sans); color: var(--muted); margin-top: 5px; position: relative; }
 
 /* ------------------------------------------------------------------ section */
@@ -375,19 +375,38 @@ section + section::before {
 }
 .card-year {
   font: 700 13px/1 var(--mono); letter-spacing: 0.08em;
-  color: var(--faint); font-variant-numeric: tabular-nums;
+  color: var(--accent); font-variant-numeric: tabular-nums; opacity: 0.7;
+  transition: opacity .18s;
 }
-.card:hover .card-year { color: var(--text-soft); }
+.card:hover .card-year { opacity: 1; }
 
 /* Case cards get a coloured left border matching their confidence level.
  * The class is set by aurora.js on the article element (conf-primary etc.).
  * Hover state amplifies the colour signal with a matching glow. */
-article.card.conf-primary  { border-left: 3px solid var(--conf-primary); }
-article.card.conf-reported { border-left: 3px solid var(--conf-reported); }
-article.card.conf-partial  { border-left: 3px solid var(--conf-partial); }
+article.card.conf-primary  { border-left: 3px solid var(--conf-primary); border-top: 2px solid var(--conf-primary); }
+article.card.conf-reported { border-left: 3px solid var(--conf-reported); border-top: 2px solid var(--conf-reported); }
+article.card.conf-partial  { border-left: 3px solid var(--conf-partial);  border-top: 2px solid var(--conf-partial);  }
 article.card.conf-primary:hover  { border-color: var(--conf-primary);  box-shadow: 0 20px 48px rgba(2,6,23,0.5), 0 0 0 1px rgba(95,212,232,0.4) inset,  0 0 28px rgba(95,212,232,0.10);  }
 article.card.conf-reported:hover { border-color: var(--conf-reported); box-shadow: 0 20px 48px rgba(2,6,23,0.5), 0 0 0 1px rgba(143,166,247,0.4) inset, 0 0 28px rgba(143,166,247,0.10); }
 article.card.conf-partial:hover  { border-color: var(--conf-partial);  box-shadow: 0 20px 48px rgba(2,6,23,0.5), 0 0 0 1px rgba(245,158,11,0.4) inset,  0 0 28px rgba(245,158,11,0.10);  }
+
+/* Ghost year watermark: large faint year behind each case card's content.
+   The card is overflow:hidden so it clips the giant glyph at the edges,
+   creating a half-visible watermark. z-index:0 keeps it below card children
+   which carry z-index:1 from the card::before rule above. */
+article.card[data-year]::after {
+  content: attr(data-year);
+  position: absolute; right: 8px; bottom: 4px;
+  font: 800 92px/1 var(--mono); letter-spacing: -0.04em;
+  pointer-events: none; z-index: 0;
+  transition: opacity .18s;
+}
+article.card.conf-primary[data-year]::after  { color: rgba(95,  212, 232, 0.07); }
+article.card.conf-reported[data-year]::after { color: rgba(143, 166, 247, 0.07); }
+article.card.conf-partial[data-year]::after  { color: rgba(245, 158,  11, 0.07); }
+article.card[data-year]:hover::after { opacity: 1.6; }
+
+
 
 
 /* Chip row on a case card. Was an inline margin on every instance. */
@@ -489,8 +508,9 @@ aside.card h3 {
 .search:focus-within svg { opacity: .8; }
 .seg { display: flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid var(--line); background: rgba(148, 176, 214, 0.06); overflow-x: auto; max-width: 100%; }
 .seg button {
-  border: 0; cursor: pointer; white-space: nowrap; border-radius: 999px; padding: 8px 13px;
-  background: transparent; color: var(--muted); font: 500 12.5px/1 var(--sans); transition: all .16s var(--ease);
+  border: 0; cursor: pointer; white-space: nowrap; border-radius: 999px; padding: 9px 16px;
+  background: transparent; color: var(--muted); font: 500 13px/1 var(--sans); transition: all .16s var(--ease);
+  letter-spacing: 0.01em;
 }
 .seg button:hover:not(:disabled) { color: var(--text); background: rgba(148, 176, 214, 0.1); }
 .seg button[aria-pressed="true"] {

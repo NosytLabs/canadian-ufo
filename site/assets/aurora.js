@@ -273,7 +273,7 @@
     // Year extracted from ISO date (e.g. "1967-10-04" → "1967")
     var year = c.date ? c.date.slice(0, 4) : "";
     return '<article class="card conf-' + (Aurora.CONF[c.conf] ? c.conf : "partial") +
-      '" data-case-card="' + esc(c.slug) + '" id="' + esc(c.slug) + '">' +
+      '" data-case-card="' + esc(c.slug) + '" data-year="' + esc(year) + '" id="' + esc(c.slug) + '">' +
       '<div class="card-header">' +
         '<span class="card-year">' + esc(year) + "</span>" +
         '<span class="chip ' + cl.chip + '">' + cl.short + "</span>" +
