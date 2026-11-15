@@ -91,8 +91,17 @@
       <div class="sec-num">01</div>
       <div class="sec-head-col">
         <h2 class="sec-title">The index</h2>
-        <p class="sec-dek">Strongest sourcing first. Each card opens a standalone page with the record and its sources.</p>
+        <p class="sec-dek">Filter by sourcing grade. Each card opens a standalone page with the full record.</p>
       </div>
+    </div>
+    <div class="filters">
+      <div class="seg" id="case-conf-filter" role="group" aria-label="Filter by sourcing grade">
+        <button data-conf="all" aria-pressed="true">All 20</button>
+        <button data-conf="primary" aria-pressed="false"><span class="chip chip-a" aria-hidden="true"></span> Archival</button>
+        <button data-conf="reported" aria-pressed="false"><span class="chip" aria-hidden="true"></span> Reported</button>
+        <button data-conf="partial" aria-pressed="false"><span class="chip chip-amb" aria-hidden="true"></span> Thin sourcing</button>
+      </div>
+      <span class="count-note" id="case-count" aria-live="polite">20 cases</span>
     </div>
     <div class="grid g-3" id="case-grid" aria-live="polite"><p class="spinner">Loading case files…</p></div>
     <noscript><div class="noscript-note"><p><b>This section is assembled in the browser.</b> The same records are in the site’s data files — <code>data/cases.json</code> — so nothing is missing, but nothing is pre-rendered either.</p></div></noscript>

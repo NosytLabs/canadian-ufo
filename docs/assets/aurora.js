@@ -301,7 +301,37 @@
     var host = $("#case-grid");
     if (!host) return;
     fetchJSON("data/cases.json").then(function (cases) {
-      host.innerHTML = sortCases(cases).map(caseCard).join("");
+      var all = sortCases(cases);
+      var confFilter = "all";
+      var seg = $("#case-conf-filter");
+      var countNote = $("#case-count");
+
+      function draw() {
+        var list = confFilter === "all" ? all
+          : all.filter(function (c) { return c.conf === confFilter; });
+        host.innerHTML = list.length
+          ? list.map(caseCard).join("")
+          : '<p class="note" style="padding:24px 0">No cases match that filter.</p>';
+        if (countNote) countNote.textContent = list.length + " case" + (list.length !== 1 ? "s" : "");
+      }
+
+      if (seg) {
+        // Update "All 20" button text with real count
+        var allBtn = seg.querySelector('[data-conf="all"]');
+        if (allBtn) allBtn.textContent = "All " + all.length;
+
+        $$("button", seg).forEach(function (b) {
+          b.addEventListener("click", function () {
+            confFilter = b.dataset.conf || "all";
+            $$("button", seg).forEach(function (x) {
+              x.setAttribute("aria-pressed", String(x === b));
+            });
+            draw();
+          });
+        });
+      }
+
+      draw();
     }).catch(function (e) {
       host.innerHTML = '<div class="error-note">Could not load case files: ' + e.message + "</div>";
     });

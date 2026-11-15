@@ -23,7 +23,7 @@
   --text: #e8eef7;
   --text-soft: #b9c7da;
   --muted: #8497ae;
-  --faint: #7286a0;   /* 5.4:1 on the page, 5.1:1 on a card -- it carries 10-12px
+  --faint: #7c90a8;   /* slightly brighter — still AA at 10-12px
                     table headers, column labels and counts, so it has to clear
                     AA for body text rather than only for large text */
   --red: #e11d48;
@@ -176,7 +176,7 @@ body {
 .hero .tagline { margin: 14px 0 0; max-width: 34ch; font: 400 clamp(17px, 2.1vw, 22px)/1.56 var(--serif); color: var(--text); }
 .hero-lede { margin: 22px 0 0; max-width: 64ch; color: var(--muted); font-size: 15.5px; }
 .hero-lede strong { color: var(--text-soft); font-weight: 600; }
-.hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; align-items: center; }
 .hero-tight { padding-bottom: clamp(28px, 3.5vw, 56px); }
 
 /* Case-page heroes carry a confidence-coloured bottom accent line and a
@@ -231,7 +231,12 @@ body {
 .prose-note { color: var(--muted); font-size: 13.6px; max-width: 72ch; margin: 10px 0 0; }
 .search-note { color: var(--muted); margin: 0 0 12px; }
 .figure-cap { margin-top: 10px; }
-.readout-num { font-size: 44px; margin-top: 8px; }
+.readout-num { 
+  font-size: 44px; margin-top: 8px; letter-spacing: -0.03em;
+  color: var(--accent); font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 24px rgba(95, 212, 232, 0.3);
+  font-family: var(--mono);
+}
 
 .btn {
   display: inline-flex; align-items: center; gap: 9px; text-decoration: none; cursor: pointer;
@@ -510,7 +515,12 @@ aside.card h3 {
 .seg button {
   border: 0; cursor: pointer; white-space: nowrap; border-radius: 999px; padding: 9px 16px;
   background: transparent; color: var(--muted); font: 500 13px/1 var(--sans); transition: all .16s var(--ease);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.01em; display: inline-flex; align-items: center; gap: 6px;
+}
+/* Small dot indicator inside the filter buttons */
+.seg button .chip {
+  width: 7px; height: 7px; border-radius: 50%; padding: 0;
+  background: var(--conf, var(--accent)); border: 0; flex: 0 0 auto;
 }
 .seg button:hover:not(:disabled) { color: var(--text); background: rgba(148, 176, 214, 0.1); }
 .seg button[aria-pressed="true"] {
@@ -863,6 +873,11 @@ td .none { color: var(--faint); font-style: italic; }
 .case-nav-item:hover .case-nav-dir { color: var(--accent); }
 @media (max-width: 540px) { .case-nav { grid-template-columns: 1fr; } }
 
+
+
+/* Survey stat cards on the overview page */
+.card .readout-label { font-size: 11px; letter-spacing: 0.14em; }
+.card:hover .readout-num { text-shadow: 0 0 32px rgba(95, 212, 232, 0.5); }
 
 /* -------------------------------------------------- archive gap visualisation */
 .gap-vis { margin: 28px 0; }
