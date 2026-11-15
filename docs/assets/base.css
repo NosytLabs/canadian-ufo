@@ -159,6 +159,29 @@ body {
   background-image: radial-gradient(circle, rgba(148, 176, 214, 0.065) 1px, transparent 1px);
   background-size: 28px 28px;
 }
+/* Radar rings — homepage hero only (not hero-tight sub-pages, not hero-case pages).
+   Two concentric circles reinforce the brand-mark aesthetic without touching content.
+   overflow:hidden clips them at the section edge. */
+.hero:not(.hero-tight):not(.hero-case) {
+  overflow: hidden;
+}
+.hero:not(.hero-tight):not(.hero-case) > * { position: relative; z-index: 1; }
+.hero:not(.hero-tight):not(.hero-case)::before {
+  content: ""; position: absolute;
+  width: clamp(380px, 48vw, 680px); aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(95, 212, 232, 0.09);
+  top: 50%; right: -4%; transform: translateY(-50%);
+  pointer-events: none; z-index: 0;
+}
+.hero:not(.hero-tight):not(.hero-case)::after {
+  content: ""; position: absolute;
+  width: clamp(240px, 31vw, 440px); aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(95, 212, 232, 0.14);
+  top: 50%; right: 7%; transform: translateY(-50%);
+  pointer-events: none; z-index: 0;
+}
 .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.32fr) minmax(0, 0.68fr); gap: clamp(28px, 4vw, 56px); align-items: center; }
 /* A hero with no side panel. The 940px query below already collapses to one
    column on narrow screens, so this only has to handle the wide case -- which
@@ -177,7 +200,7 @@ body {
   letter-spacing: -0.04em;
   color: #fff;
   /* aurora gradient: white → ice-blue → cyan accent */
-  background: linear-gradient(135deg, #fff 18%, #d6f4fa 48%, var(--accent) 100%);
+  background: linear-gradient(135deg, #fff 15%, #e0f8fc 42%, var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -379,8 +402,8 @@ section + section::before {
 .card > * { position: relative; z-index: 1; }
 .card:hover { border-color: var(--accent-line); background: rgba(18, 28, 48, 0.7); box-shadow: 0 20px 48px rgba(2, 6, 23, 0.5), 0 0 0 1px var(--accent-line) inset; }
 .card h3 { margin: 0 0 10px; font: 650 19px/1.3 var(--sans); letter-spacing: -0.018em; }
-.card p { margin: 0; color: var(--muted); font-size: 14.4px; }
-.card .meta { margin-top: auto; padding-top: 14px; }
+.card p { margin: 0; color: var(--text-soft); font-size: 14.4px; opacity: 0.82; }
+.card .meta { margin-top: auto; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* Card header: year badge + confidence chip side by side */
 .card-header {
@@ -839,12 +862,15 @@ td .none { color: var(--faint); font-style: italic; }
 
 .qa { display: grid; gap: 0; }
 .qa details { border-bottom: 1px solid var(--line); }
+.qa details[open] { border-bottom-color: var(--accent-line); }
 .qa summary { cursor: pointer; list-style: none; padding: 19px 40px 19px 0; position: relative; font: 600 16.5px/1.45 var(--sans); }
 .qa summary::-webkit-details-marker { display: none; }
 .qa summary::after { content: "+"; position: absolute; right: 8px; top: 19px; font: 400 22px/1 var(--mono); color: var(--accent); }
 .qa details[open] summary::after { content: "\2013"; }
+.qa details[open] > summary { color: #fff; }
 .qa summary:hover { color: var(--accent); }
-.qa .a { padding: 0 0 20px; color: var(--text-soft); font-size: 14.6px; max-width: 78ch; }
+.qa .a { padding: 0 0 20px 16px; color: var(--text-soft); font-size: 14.6px; max-width: 78ch;
+  border-left: 2px solid var(--accent-line); margin-left: 2px; }
 .qa .a p { margin: 0 0 10px; }
 
 .quote {

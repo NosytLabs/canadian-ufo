@@ -346,6 +346,11 @@ def case_page(c, all_cases, media):
         <ul class="linklist" >
 {docs}
         </ul>
+        <div class="case-meta-row mt-4">
+          <span class="chip chip-a">{esc(c['display'])}</span>
+          {'<span class="chip">' + esc(c.get('region','')) + '</span>' if c.get('region') else ''}
+          <span class="chip"><a href="map.html#{esc(c['slug'])}" class="inherit">View on map →</a></span>
+        </div>
       </aside>
     </div>
   </section>
