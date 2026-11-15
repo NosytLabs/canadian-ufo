@@ -290,6 +290,8 @@ def case_page(c, all_cases, media):
         % (esc(x["slug"]), esc(x["title"]), esc(x.get("prov", "")), esc(x["summary"][:120]) + "…")
         for x in others)
 
+    conf_key = c["conf"] if c["conf"] in CONF else "partial"
+
     prev_nav = ('      <a class="case-nav-item case-nav-prev" href="case-%s.html">'
                '<span class="case-nav-dir">← Earlier</span>'
                '<span class="case-nav-title">%s, %s</span></a>'
@@ -302,7 +304,7 @@ def case_page(c, all_cases, media):
     body = HEAD.format(
         title=esc(title), desc=esc(desc), twitter_desc=esc(twitter_desc),
         base=BASE, slug=c["slug"], jsonld=jsonld, nav=nav("case.html")) + f"""
-  <section class="hero hero-tight">
+  <section class="hero hero-tight hero-case hero-case-{conf_key}">
     <div class="hero-inner hero-1col">
       <div>
         <p class="kicker">Case file · {esc(c.get('region', 'Canada'))} · {esc(label)}</p>
