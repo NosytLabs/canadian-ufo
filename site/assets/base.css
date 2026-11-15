@@ -374,6 +374,15 @@ article.card.conf-partial:hover  { border-color: var(--conf-partial);  box-shado
 /* Chip row on a case card. Was an inline margin on every instance. */
 .card-chips { margin-bottom: 12px; }
 
+/* Primary sources aside on case pages — accent tint + source counter label */
+aside.card {
+  background: color-mix(in srgb, var(--glass) 90%, rgba(95,212,232,0.06) 10%);
+}
+aside.card h3 {
+  color: var(--accent); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: var(--mono); font-weight: 500; margin-bottom: 16px;
+}
+
 .tranches { margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
 .tranche {
   display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 20px; align-items: start;
