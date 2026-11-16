@@ -144,7 +144,7 @@ Turner in another), and the missing MERINT incident list for Atlantic waters.
   reports. Note: this compilation is RCAF/ATC material; a related research pass
   found no MERINT content in it.
 - **Sky Canada Project** — Office of the Chief Science Advisor, June 2025, 59 pages,
-  14 recommendations. <https://www.science.gc.ca/site/science/sites/default/files/sky-canada-report.pdf>
+  14 recommendations. <https://science.gc.ca/site/science/en/office-chief-science-advisor/sky-canada-project/management-public-reporting-unidentified-aerial-phenomena-canada>
 - **The 2025 Canadian UFO Survey** — Ufology Research, published 9 March 2026:
   1,052 reports, 3.42% unexplained, 16.83% explained, about 34% probable and about
   46% insufficient information, against a 10.22% unexplained average over the
