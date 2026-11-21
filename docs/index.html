@@ -326,7 +326,7 @@
       <div id="map" role="application" aria-label="Map of Canadian UAP case locations"></div>
       <div class="map-side">
         <div class="map-panel">
-          <div class="readout-label" >Case files &middot; 20 &middot; oldest first</div>
+          <div class="readout-label">Case files &middot; 20 &middot; oldest first</div>
           <div class="map-scroll">
             <ul class="map-list" id="map-list" role="group" aria-label="Case list"></ul>
           </div>
@@ -339,7 +339,10 @@
            still credited a CARTO basemap that had been replaced with OpenFreeMap,
            in the line directly below one that named it correctly. -->
     </div>
-    <ul class="chips" id="map-legend"></ul>
+    <div style="margin-top:16px; display:flex; align-items:center; flex-wrap:wrap; gap:6px 20px;">
+      <span class="readout-label">Map key</span>
+      <ul class="flush" id="map-legend" style="display:contents;"></ul>
+    </div>
   </section>
 
   <!-- ======================================================== releases -->
